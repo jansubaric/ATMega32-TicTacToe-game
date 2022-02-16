@@ -64,6 +64,11 @@
 #define CHAR_W 5 //char width
 #define FONT_SIZE 3
 
+#define PLB_HEAD_Y 25 //printleaderboards header y
+#define PLB_HEAD_X 100
+#define PLB_Y 80
+#define PLB_X 100
+
 char newPlayerName[7] = {' '}; //6+nulterm
 //newPlayerName[6] = '\0';
 uint8_t newPlayerNameIndex = 0;
@@ -176,12 +181,14 @@ void sortByPoints() {
 
 void printLeaderboards(Player *players, uint8_t players_size) { //treba da sortira silazno po points i ovo da ljepse ispisuje
 	sortByPoints();
-	print_string(30, 100, 3, WHITE, CYAN, "NAME\0");
-	print_string(30, 100+100, 3, WHITE, CYAN, "POINTS\0");
+	print_string(PLB_HEAD_Y, PLB_HEAD_X, 3, WHITE, CYAN, "NAME\0");
+	print_string(PLB_HEAD_Y, 2*PLB_HEAD_X, 3, WHITE, CYAN, "POINTS\0");
+	char tmp[2];
+	tmp[1] = '\0';
 	for(uint8_t i = 0; i < players_size; i++) {
 		tmp[0] = players[i].points + '0';
-		print_string(80 + i*40, 100, 3, WHITE, CYAN, players[i].name);
-		print_string(80 + i*40, 100+150, 3, WHITE, CYAN, tmp);
+		print_string(PLB_Y + i*(4*BLANK_SPACE), PLB_X, 3, WHITE, CYAN, players[i].name);
+		print_string(PLB_Y + i*(4*BLANK_SPACE), PLB_X + 15*BLANK_SPACE, 3, WHITE, CYAN, tmp);
 	}
 }
 
@@ -228,7 +235,7 @@ int main() {
 	//initialize_menu();
 
 	TFT_start();
-
+	
 	//uint8_t board[3][3];            // grid
 	uint16_t TP_X;                  // received coordiates rom tuch part of screen
 	uint16_t TP_Y;                  // received coordiates rom tuch part of screen
@@ -236,11 +243,10 @@ int main() {
 	//uint8_t i = 0;
 	uint8_t currentPage = HOMESCREEN; //0 - homescreen //vratit na HOMESCREEN
 	char str[22] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'V', 'Z'};
-	char tmp[1];
 	//print_keyboard(str);
 	//Player players[4];
 	
-	Player p1; //ovo dinamicki radit, ovo je samo radi probavanja
+	Player p1; //ovo dinamicki radi
 	p1.points = 0;
 	for(uint8_t j = 0; j < 7; j++) {
 		p1.name[j] = 'A';
