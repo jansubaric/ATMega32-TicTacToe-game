@@ -69,6 +69,13 @@
 #define PLB_Y 80
 #define PLB_X 100
 
+#define MAX_PLAYERS 4
+
+#define GRID_STARTING_X 110
+#define GRID_STARTING_Y (BCK_BTN_Y + BCK_BTN_H - BLANK_SPACE/2)
+#define GRID_RECT_SIZE 185 //cijeli rect, SIZE->kao jednaki W i H
+#define GRID_BLOCK_SIZE 62 //round(185/3)
+
 char newPlayerName[7] = {' '}; //6+nulterm
 //newPlayerName[6] = '\0';
 uint8_t newPlayerNameIndex = 0;
@@ -82,12 +89,32 @@ struct Player {
 	uint8_t clicked;
 	char name[7]; //6 + nulterm
 };
-Player players[4];
+
+//class Player {
+	////Player() {
+	////points = 0;
+	////}
+	//public:
+		//uint8_t points;
+		//uint16_t color;
+		//uint8_t clicked;
+		//char name[7]; //6 + nulterm
+//};
+
+//Player players[4];
 uint8_t players_size = 4; //stavi u 0 poslije
 //uint8_t players_size = 0; //stavi u 0 poslije
 uint8_t cross_chosen = 5, nought_chosen = 5; //5 je kao nista nije odabrano, ne mozes -1 jer ne unsigned int
 uint8_t hs_first_enter = 0; //home screen
+uint8_t board[3][3] = {0};
 
+#define CROSS 1
+#define NOUGHT 2
+#define EMPTY 0
+uint8_t currentPlayer = CROSS;	
+uint8_t gameOver = 0;
+uint8_t numberOfMoves = 0;	
+	
 
 void print_keyboard(char str[]) {
 	uint8_t offset_x, offset_y;
@@ -96,7 +123,7 @@ void print_keyboard(char str[]) {
 	offset_x = (KEY_W - 1 * CHAR_W * FONT_SIZE) / 2;
 	offset_y = (KEY_H - 1 * CHAR_H * FONT_SIZE) / 2;
 	char tmp[2];
-	for(uint8_t i = 0; i < strlen(str); i++) { 
+	for(uint8_t i = 0; i < 22; i++) { //ako stavim strlen(str) onda napise jos 3 neka cudna char-a, a ko stavim 22 sve okej
 		sprintf(tmp, "%c\0", str[i]);
 		draw_rectangle(KEY_Y + i/9 * (KEY_H + BLANK_SPACE/2), KEY_X + i%9*(BLANK_SPACE/2 + KEY_W), KEY_H, KEY_W, WHITE);
 		print_string(KEY_Y + offset_y + i/9 * (KEY_H + BLANK_SPACE / 2), KEY_X + i%9*(KEY_W + BLANK_SPACE / 2) + offset_x, 3, WHITE, CYAN, tmp);
@@ -143,7 +170,7 @@ void resetNewPlayerName() {
 	newPlayerNameIndex = 0;
 }
 
-void resetPlayersColors() { //andClicks,, mozda bolje nazvat funkciju
+void resetPlayersColors(Player *players) { //andClicks,, mozda bolje nazvat funkciju
 	for(uint8_t i = 0; i < players_size; i++) {
 		players[i].color = WHITE;
 		players[i].clicked = 0;
@@ -151,7 +178,13 @@ void resetPlayersColors() { //andClicks,, mozda bolje nazvat funkciju
 	cross_chosen = 5;
 	nought_chosen = 5;
 }
-void checkBackButtonPressed(uint16_t *TP_X, uint16_t *TP_Y, uint8_t *currentPage) {
+void resetGame() {
+	memset(board, 0, sizeof(board)); //reset board, mozda za ovo bolje napravit funkciju kao resetGame()
+	currentPlayer = CROSS; //reset player
+	gameOver = 0;
+	numberOfMoves = 0;
+}
+void checkBackButtonPressed(uint16_t *TP_X, uint16_t *TP_Y, uint8_t *currentPage, Player *players) {
 	if(get_bit(PINB, T_IRQ) == 0) {
 		read_touch_coords(TP_X, TP_Y);
 		if(check_touch(*TP_X, *TP_Y, BCK_BTN_Y, BCK_BTN_X, BCK_BTN_H, BCK_BTN_W)) { //BACK button, ovo bolje napravit preko define-a --jesam
@@ -160,14 +193,15 @@ void checkBackButtonPressed(uint16_t *TP_X, uint16_t *TP_Y, uint8_t *currentPage
 			if(*currentPage == NEW_PLAYER) { //ako je bio u NEW PLAYER da cleara
 				resetNewPlayerName();
 			}else if(*currentPage == CHOOSE_PLAYER || *currentPage == GAME) { //ako je bio u CHOOSE PLAYER ili u GAME
-				resetPlayersColors();
+				resetPlayersColors(players);
+				resetGame();
 			}
 			*currentPage = HOMESCREEN;
 			//clrScr();
 		}
 	}
 }
-void sortByPoints() {
+void sortByPoints(Player *players) {
 	for(uint8_t i = 0; i < players_size - 1; i++) {
 		for(uint8_t j = 0; j < players_size - i - 1; j++) {
 			if(players[j].points < players[j+1].points) {
@@ -179,8 +213,8 @@ void sortByPoints() {
 	}
 }
 
-void printLeaderboards(Player *players, uint8_t players_size) { //treba da sortira silazno po points i ovo da ljepse ispisuje
-	sortByPoints();
+void printLeaderboards(Player *players, uint8_t players_size) {
+	sortByPoints(players);
 	print_string(PLB_HEAD_Y, PLB_HEAD_X, 3, WHITE, CYAN, "NAME\0");
 	print_string(PLB_HEAD_Y, 2*PLB_HEAD_X, 3, WHITE, CYAN, "POINTS\0");
 	char tmp[2];
@@ -199,7 +233,7 @@ void showPlayers(Player *players, uint8_t players_size) { //dodat da se imena is
 		offset_x = (SP_BTN_W - strlen(players[i].name) * CHAR_W * FONT_SIZE)/2;
 		offset_y = (SP_BTN_H - 1 * CHAR_H * FONT_SIZE)/2;
 		
-		draw_rectangle(SP_BTN_Y + tmp, SP_BTN_X + (i%2)*(SP_BTN_W + BLANK_SPACE), SP_BTN_H, SP_BTN_W, players[i].color); //i/2 jer ide i+=2
+		draw_rectangle(SP_BTN_Y + tmp, SP_BTN_X + (i%2)*(SP_BTN_W + BLANK_SPACE), SP_BTN_H, SP_BTN_W, players[i].color);
 		print_string(SP_BTN_Y + tmp + offset_y, SP_BTN_X + offset_x + (i%2)*(SP_BTN_W + BLANK_SPACE), 3, players[i].color, CYAN, players[i].name);
 	}
 }
@@ -229,6 +263,88 @@ void drawStartButton() {
 	print_string(START_BTN_Y + offset_y, START_BTN_X + offset_x , 3, WHITE, CYAN, "START\0");
 }
 
+void drawNames(Player *players) {
+	char tmp[7+1+2+1+7]; //max first name, space, vs, space, max 2nd name //mozda 6 umjesto 7 al dobrop
+	sprintf(tmp, "%s VS %s", players[cross_chosen].name, players[nought_chosen].name);
+	uint8_t offset_x = (MAX_Y - BLANK_SPACE - (BCK_BTN_X + BCK_BTN_W) - strlen(tmp) * CHAR_W * 2) / 2; //2 je FONT_SIZE, 220 -> sirina od kraja BCK_BTN do 310
+	print_string(BLANK_SPACE, (BCK_BTN_X + BCK_BTN_W) + offset_x, 2, WHITE, CYAN, tmp); //90 je kraj od bck btn,, mozda da je ime svako u svojoj boji ili kako oces
+}
+
+void drawGrid() {
+	//draw_rectangle(10+40-5, 110, 185, 185, WHITE);
+	
+	draw_v_line(GRID_STARTING_X + GRID_BLOCK_SIZE, GRID_STARTING_Y, GRID_STARTING_Y + GRID_RECT_SIZE, WHITE); //62=185/3
+	draw_v_line(GRID_STARTING_X + 2*GRID_BLOCK_SIZE, GRID_STARTING_Y, GRID_STARTING_Y + GRID_RECT_SIZE, WHITE);
+	
+	draw_h_line(GRID_STARTING_Y + GRID_BLOCK_SIZE, GRID_STARTING_X, GRID_STARTING_X + GRID_RECT_SIZE, WHITE);
+	draw_h_line(GRID_STARTING_Y + 2*GRID_BLOCK_SIZE, GRID_STARTING_X, GRID_STARTING_X + GRID_RECT_SIZE, WHITE);
+	
+}
+
+void drawTurn(Player *players) {
+	print_string(BCK_BTN_Y + BCK_BTN_H + 4*BLANK_SPACE, BCK_BTN_X, 3, WHITE, CYAN, "TURN:\0");
+	if(currentPlayer == CROSS) {
+		print_string(BCK_BTN_Y + BCK_BTN_H + 7*BLANK_SPACE, BCK_BTN_X, 2, players[cross_chosen].color, CYAN, players[cross_chosen].name); //napravit da se ispise ime onog koji je na redu, mozes to s nekom pomocnom varijablom
+	}else{
+		print_string(BCK_BTN_Y + BCK_BTN_H + 7*BLANK_SPACE, BCK_BTN_X, 2, players[nought_chosen].color, CYAN, players[nought_chosen].name);
+	}
+}
+
+uint8_t drawOnGrid(uint8_t y, uint8_t x) { //skuzi kako ovo centrirat i napravi preko define-ova
+	if(currentPlayer == CROSS) { //nesto sa players[cross_chosen]
+		//print_string(y + 10, x + 10, 2, WHITE, CYAN, "X\0");
+		//draw_cross(y-5,x,62, WHITE); //bilo 62, 88 = sqrt(62**2 + 62**2) //treba podignut za 5 da bi bio tocno na sredini nez tocno zas
+		//draw_cross(y + y/20 - 5,x + x/20, 62-62/3, WHITE);
+		draw_cross(y + 11 - 5,x + 11 - 3, 62-62/3, RED); //skuzi malo kako ovo centrirat
+		//print_string(BCK_BTN_Y + BCK_BTN_H + 40, BCK_BTN_X, 3, WHITE, CYAN, "TURN:\0");
+		//print_string(BCK_BTN_Y + BCK_BTN_H + 40 + 50, BCK_BTN_X, 2, players[cross_chosen].color, CYAN, players[cross_chosen].name);
+		return NOUGHT;
+	}else {
+		//print_string(y + 10, x + 10, 2, WHITE, CYAN, "O\0");
+		//print_string(BCK_BTN_Y + BCK_BTN_H + 40, BCK_BTN_X, 3, WHITE, CYAN, "TURN:\0");
+		//print_string(BCK_BTN_Y + BCK_BTN_H + 40 + 50, BCK_BTN_X, 2, players[nought_chosen].color, CYAN, players[nought_chosen].name);
+		draw_circle(y + 11 - 5 - 3, x + 11 - 3, 23, GREEN); //62/3   //skuzi malo kako ovo centrirat
+		return CROSS;
+	}
+}
+
+void checkGameOver(Player *players) {
+	uint8_t winner = 0;
+	for (uint8_t i = 0; i < 3; i++) {
+		if (board[i][0] != EMPTY && board[i][0] == board[i][1] && board[i][1] == board[i][2]) {
+			gameOver = 1; // 3 same in a row
+			winner = board[i][0];
+			break;
+		}
+		if (board[0][i] != EMPTY && board[0][i] == board[1][i] && board[1][i] == board[2][i]) {
+			gameOver = 1; // 3 same in a column
+			winner = board[0][i];
+			break;
+		}
+	}
+
+	if (board[1][1] != EMPTY && ((board[0][0] == board[1][1] && board[1][1] == board[2][2]) || (board[0][2] == board[1][1] && board[1][1] == board[2][0]))) {
+		gameOver = 1; // 3 same in a diagonal
+		winner = board[1][1];
+	}
+	
+	if(gameOver) { //ovo preko define-ova
+		print_string(MAX_X-20-30-20, 10, 3, WHITE, CYAN, "WON:\0");
+		winner == CROSS ? print_string(MAX_X - 4*BLANK_SPACE, BLANK_SPACE, 2, players[cross_chosen].color, CYAN, players[cross_chosen].name) : print_string(MAX_X - 4*BLANK_SPACE, BLANK_SPACE, 2, players[nought_chosen].color, CYAN, players[nought_chosen].name);
+		winner == CROSS ? players[cross_chosen].points++ : players[nought_chosen].points++;
+		//if(winner == CROSS) {
+			//players[cross_chosen].points = 99;
+			//players[cross_chosen].name[0] = ':';
+			//change(&players[cross_chosen]);
+			//print_string(200, 200, 3, WHITE, CYAN, "DA NE");
+		//}
+	}else if(numberOfMoves == 9) {
+		//tie
+		print_string(MAX_X - 7*BLANK_SPACE, BLANK_SPACE, 3, WHITE, CYAN, "TIE\0");
+	}
+	
+}
+
 int main() {
 	TFT_init();
 
@@ -236,7 +352,6 @@ int main() {
 
 	TFT_start();
 	
-	//uint8_t board[3][3];            // grid
 	uint16_t TP_X;                  // received coordiates rom tuch part of screen
 	uint16_t TP_Y;                  // received coordiates rom tuch part of screen
 	set_background_color(CYAN); //kao neki clearscr
@@ -245,6 +360,8 @@ int main() {
 	char str[22] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'V', 'Z'};
 	//print_keyboard(str);
 	//Player players[4];
+	
+	Player players[MAX_PLAYERS];
 	
 	Player p1; //ovo dinamicki radi
 	p1.points = 0;
@@ -317,13 +434,13 @@ int main() {
 		}else if(currentPage == NEW_PLAYER) {
 			drawBackButton();
 			print_keyboard(str);
-			checkBackButtonPressed(&TP_X, &TP_Y, &currentPage);
+			checkBackButtonPressed(&TP_X, &TP_Y, &currentPage, players);
 			drawDeleteButton();
 			drawOKButton();
 				
 			if(get_bit(PINB, T_IRQ) == 0) {
 				read_touch_coords(&TP_X, &TP_Y);
-				for(uint8_t i = 0; i < strlen(str); i++){
+				for(uint8_t i = 0; i < 22; i++){ //strlen(str) ali on nekad baca gresku nez zas
 					if(check_touch(TP_X, TP_Y, KEY_Y + i/9 * (KEY_H + BLANK_SPACE/2), KEY_X + i%9*(BLANK_SPACE/2 + KEY_W), KEY_H, KEY_W)) { //stisnut neki key od keyboarda
 						if(newPlayerNameIndex == 6) break; //jer ime ima max 7 char-a
 						clrScr();
@@ -372,7 +489,7 @@ int main() {
 			
 		}else if(currentPage == CHOOSE_PLAYER) {
 			drawBackButton();
-			checkBackButtonPressed(&TP_X, &TP_Y, &currentPage);
+			checkBackButtonPressed(&TP_X, &TP_Y, &currentPage, players);
 			showPlayers(players, players_size);
 			drawStartButton();
 			
@@ -399,7 +516,7 @@ int main() {
 							nought_chosen = 5;
 							players[i].clicked = 0;
 						}
-						_delay_ms(100); //da ne napravi 2 ocitanja
+						_delay_ms(50); //da ne napravi 2 ocitanja
 						break;
 					}
 				}
@@ -413,14 +530,34 @@ int main() {
 			}
 		}else if(currentPage == LEADERBOARDS) {
 			drawBackButton();
-			checkBackButtonPressed(&TP_X, &TP_Y, &currentPage);
+			checkBackButtonPressed(&TP_X, &TP_Y, &currentPage, players);
 			//printLeaderboards(players, sizeof(players) / sizeof(players[0])); //moras prije nego saljes u funkciju jer se u funkciju salje samo pointer, ali ovo ce ti poslat za koliko njih je alocirano mjesta, a ne koliko ih je stvarno unutra
 			printLeaderboards(players, players_size);
 		}else if(currentPage == GAME) {
-			//dodat kod za igru
 			drawBackButton();
-			checkBackButtonPressed(&TP_X, &TP_Y, &currentPage);
-			print_string(200, 200, 3, WHITE, CYAN, "BOK\0"); //maknut
+			checkBackButtonPressed(&TP_X, &TP_Y, &currentPage, players);
+			//print_string(200, 200, 3, WHITE, CYAN, "BOK\0"); //maknut
+			drawNames(players);
+			drawGrid();
+			
+			if(gameOver) continue;
+			
+			checkGameOver(players); //ide ispod ovog if-a tako da se ne vrti bezveze ako je gotovo
+			drawTurn(players);		
+			if (get_bit(PINB, T_IRQ) == 0) {
+				read_touch_coords(&TP_X, &TP_Y);
+				for(uint8_t i = 0; i < 3; i++) {
+					for(uint8_t j = 0; j < 3; j++) {
+						if(check_touch(TP_X, TP_Y, 10+45-5 + j*62, 110 + i*62, 62, 62)) {
+							if(board[i][j] == EMPTY) { //ovo sa konstantama
+								board[i][j] = currentPlayer; //ovo mozes da je 1 ili 2 s obzirom dal je X iil O
+								numberOfMoves++;
+								currentPlayer = drawOnGrid(10+45-5 + j*62, 110 + i*62); //y i x koordinate gornjeg lijevog kuta kvadrata na koji je stisnuo
+							}
+						}
+					}
+				}
+			}
 		}
 		
 	}

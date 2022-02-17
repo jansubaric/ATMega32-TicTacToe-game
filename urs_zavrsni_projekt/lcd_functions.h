@@ -38,7 +38,7 @@
 #define DATA 1 // data
 
 
-static const unsigned char font[37][5] = { //bilo [29] bez ovih zadnjih 8 brojeva jer su 1 i 2 vec bili
+static const unsigned char font[38][5] = { //bilo [29] bez ovih zadnjih 8 brojeva jer su 1 i 2 vec bili
 	{0x7E, 0x11, 0x11, 0x11, 0x7E}, // 41 A
 	{0x7F, 0x49, 0x49, 0x49, 0x36}, // 42 B
 	{0x3E, 0x41, 0x41, 0x41, 0x22}, // 43 C
@@ -79,6 +79,7 @@ static const unsigned char font[37][5] = { //bilo [29] bez ovih zadnjih 8 brojev
 	{0x03, 0x71, 0x09, 0x05, 0x03}, // 7
 	{0x36, 0x49, 0x49, 0x49, 0x36}, // 8
 	{0x06, 0x49, 0x49, 0x29, 0x1E}, // 9
+	{0x00, 0x36, 0x36, 0x00, 0x00}, // :
 };
 
 uint8_t get_bit(uint8_t reg, uint8_t offset) {
@@ -288,27 +289,29 @@ void print_string(uint16_t x, uint16_t y, uint8_t font_size, uint16_t color, uin
 	do {
 		if (ch[cnt] == ' ') {
 			print_char(x + font_size, y, font_size, color, back_color, 26);
-			} else if (ch[cnt] == '0') {
+		} else if (ch[cnt] == '0') {
 			print_char(x + font_size, y, font_size, color, back_color, 27);
-			} else if (ch[cnt] == '1') {
+		} else if (ch[cnt] == '1') {
 			print_char(x + font_size, y, font_size, color, back_color, 28);
-			} else if (ch[cnt] == '2') {
+		} else if (ch[cnt] == '2') {
 			print_char(x + font_size, y, font_size, color, back_color, 29);
-			} else if (ch[cnt] == '3') {
+		} else if (ch[cnt] == '3') {
 			print_char(x + font_size, y, font_size, color, back_color, 30);
-			} else if (ch[cnt] == '4') {
+		} else if (ch[cnt] == '4') {
 			print_char(x + font_size, y, font_size, color, back_color, 31);
-			} else if (ch[cnt] == '5') {
+		} else if (ch[cnt] == '5') {
 			print_char(x + font_size, y, font_size, color, back_color, 32);
-			} else if (ch[cnt] == '6') {
+		} else if (ch[cnt] == '6') {
 			print_char(x + font_size, y, font_size, color, back_color, 33);
-			} else if (ch[cnt] == '7') {
+		} else if (ch[cnt] == '7') {
 			print_char(x + font_size, y, font_size, color, back_color, 34);
-			} else if (ch[cnt] == '8') {
+		} else if (ch[cnt] == '8') {
 			print_char(x + font_size, y, font_size, color, back_color, 35);
-			} else if (ch[cnt] == '9') {
+		} else if (ch[cnt] == '9') {
 			print_char(x + font_size, y, font_size, color, back_color, 36);
-			} else {
+		} else if (ch[cnt] == ':') {
+			print_char(x + font_size, y, font_size, color, back_color, 37);
+		} else {
 			print_char(x + font_size, y, font_size, color, back_color, ch[cnt] - 'A');
 		}
 		cnt++;
@@ -317,7 +320,7 @@ void print_string(uint16_t x, uint16_t y, uint8_t font_size, uint16_t color, uin
 }
 
 // setting a color to the pixels in a horizontal line
-void draw_h_line(uint16_t x1, uint16_t y1, uint16_t y2, uint16_t color) { //zapravo x1, y1, x2
+void draw_h_line(uint16_t x1, uint16_t y1, uint16_t y2, uint16_t color) { //zapravo y1, x1, x2
 	for (; y1 < y2; y1++) {
 		draw_pixel(x1, y1, color);
 	}
