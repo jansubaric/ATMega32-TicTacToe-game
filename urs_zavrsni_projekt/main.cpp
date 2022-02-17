@@ -18,7 +18,7 @@
 #define HS_H 60 //height
 #define HS_W 280
 
-#define CP_Y (HS_S_Y + HS_H + BLANK_SPACE) //choose player
+#define CP_Y (HS_S_Y + HS_H + BLANK_SPACE) ///choose player
 #define CP_X (HS_S_X)
 #define CP_H HS_H //height
 #define CP_W HS_W
