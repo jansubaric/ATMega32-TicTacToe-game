@@ -341,8 +341,16 @@ void draw_cross(uint16_t x, uint16_t y, uint16_t d, uint16_t color) {
 	}
 }
 
+void my_draw_cross(uint16_t x, uint16_t y, uint16_t d, uint16_t color) { //x,y sredista, d je od sredista do kuta
+	uint16_t xl = x - d, yl = y - d, xr = x + d, yr = y - d; //left corner, right corner
+	for(uint8_t i = 0; i < 2*d; i++) {
+		draw_pixel(xl + i, yl + i, color); //nacrtas pa skuzis
+		draw_pixel(xr - i, yr + i, color);
+	}
+}
+
 // setting a color to the pixels in circle
-void draw_circle(uint16_t x0, uint16_t y0, uint16_t r, uint16_t color) {
+void draw_circle(uint16_t x0, uint16_t y0, uint16_t r, uint16_t color) { //x0,y0 srediste, r radius
 	x0 += r;
 	y0 += r;
 
@@ -365,6 +373,39 @@ void draw_circle(uint16_t x0, uint16_t y0, uint16_t r, uint16_t color) {
 	} while (x <= 0);
 }
 
+void adafruit_drawCircle(uint16_t x0, uint16_t y0, uint16_t r, uint16_t color) { //unutar adaFruit library, bolji zato jer mu das srediste, i radius, a ovaj draw_cirle ne kuzim kako radi
+	int16_t f = 1 - r;
+	int16_t ddF_x = 1;
+	int16_t ddF_y = -2 * r;
+	int16_t x = 0;
+	int16_t y = r;
+
+	draw_pixel(x0, y0 + r, color);
+	draw_pixel(x0, y0 - r, color);
+	draw_pixel(x0 + r, y0, color);
+	draw_pixel(x0 - r, y0, color);
+
+	while (x < y) {
+		if (f >= 0) {
+			y--;
+			ddF_y += 2;
+			f += ddF_y;
+		}
+		x++;
+		ddF_x += 2;
+		f += ddF_x;
+
+		draw_pixel(x0 + x, y0 + y, color);
+		draw_pixel(x0 - x, y0 + y, color);
+		draw_pixel(x0 + x, y0 - y, color);
+		draw_pixel(x0 - x, y0 - y, color);
+		draw_pixel(x0 + y, y0 + x, color);
+		draw_pixel(x0 - y, y0 + x, color);
+		draw_pixel(x0 + y, y0 - x, color);
+		draw_pixel(x0 - y, y0 - x, color);
+	}
+}
+
 // setting a color to the pixels of a rectangle
 void draw_rectangle(uint16_t x, uint16_t y, uint16_t dx, uint16_t dy, uint16_t color) {
 	draw_h_line(x, y, y + dy, color);
@@ -377,3 +418,4 @@ void draw_rectangle(uint16_t x, uint16_t y, uint16_t dx, uint16_t dy, uint16_t c
 uint8_t check_touch(uint16_t TP_X, uint16_t TP_Y, uint16_t x, uint16_t y, uint16_t dx, uint16_t dy) {
 	return TP_Y >= y && TP_Y <= y + dy && TP_X >= x && TP_X <= x + dx;
 }
+

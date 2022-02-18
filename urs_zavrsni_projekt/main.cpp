@@ -70,11 +70,22 @@
 #define PLB_X 100
 
 #define MAX_PLAYERS 4
+#define MAX_NAME_LENGTH 7 //to jest 6 + nulterm
 
 #define GRID_STARTING_X 110
 #define GRID_STARTING_Y (BCK_BTN_Y + BCK_BTN_H - BLANK_SPACE/2)
 #define GRID_RECT_SIZE 185 //cijeli rect, SIZE->kao jednaki W i H
 #define GRID_BLOCK_SIZE 62 //round(185/3)
+
+#define TRY_AGAIN_Y (MAX_X - 4*BLANK_SPACE)
+#define TRY_AGAIN_X 10
+#define TRY_AGAIN_H 30
+#define TRY_AGAIN_W 105
+
+#define INPUT_NAME_Y 200
+#define INPUT_NAME_X 10
+
+#define NONE 5
 
 char newPlayerName[7] = {' '}; //6+nulterm
 //newPlayerName[6] = '\0';
@@ -87,7 +98,7 @@ struct Player {
 	uint8_t points;
 	uint16_t color;
 	uint8_t clicked;
-	char name[7]; //6 + nulterm
+	char name[MAX_NAME_LENGTH]; //6 + nulterm
 };
 
 //class Player {
@@ -104,8 +115,10 @@ struct Player {
 //Player players[4];
 uint8_t players_size = 4; //stavi u 0 poslije
 //uint8_t players_size = 0; //stavi u 0 poslije
-uint8_t cross_chosen = 5, nought_chosen = 5; //5 je kao nista nije odabrano, ne mozes -1 jer ne unsigned int
-uint8_t hs_first_enter = 0; //home screen
+uint8_t cross_chosen = NONE, nought_chosen = NONE; //5 je kao nista nije odabrano, ne mozes -1 jer je unsigned int
+uint8_t hs_first_enter = 1; //home screen
+uint8_t cp_rerender = 1; //choose player
+//uint8_t game_rerender = 1;
 uint8_t board[3][3] = {0};
 
 #define CROSS 1
@@ -175,16 +188,17 @@ void resetPlayersColors(Player *players) { //andClicks,, mozda bolje nazvat funk
 		players[i].color = WHITE;
 		players[i].clicked = 0;
 	}
-	cross_chosen = 5;
-	nought_chosen = 5;
+	cross_chosen = NONE;
+	nought_chosen = NONE;
 }
 void resetGame() {
-	memset(board, 0, sizeof(board)); //reset board, mozda za ovo bolje napravit funkciju kao resetGame()
+	memset(board, 0, sizeof(board));
 	currentPlayer = CROSS; //reset player
 	gameOver = 0;
 	numberOfMoves = 0;
+	//game_rerender = 1;
 }
-void checkBackButtonPressed(uint16_t *TP_X, uint16_t *TP_Y, uint8_t *currentPage, Player *players) {
+void checkBackButtonPressed(uint16_t *TP_X, uint16_t *TP_Y, uint8_t *currentPage, Player *players, uint8_t *game_rerender) {
 	if(get_bit(PINB, T_IRQ) == 0) {
 		read_touch_coords(TP_X, TP_Y);
 		if(check_touch(*TP_X, *TP_Y, BCK_BTN_Y, BCK_BTN_X, BCK_BTN_H, BCK_BTN_W)) { //BACK button, ovo bolje napravit preko define-a --jesam
@@ -195,7 +209,10 @@ void checkBackButtonPressed(uint16_t *TP_X, uint16_t *TP_Y, uint8_t *currentPage
 			}else if(*currentPage == CHOOSE_PLAYER || *currentPage == GAME) { //ako je bio u CHOOSE PLAYER ili u GAME
 				resetPlayersColors(players);
 				resetGame();
+				cp_rerender = 1;
+				*game_rerender = 1;
 			}
+			//*game_rerender = 1;
 			*currentPage = HOMESCREEN;
 			//clrScr();
 		}
@@ -217,10 +234,10 @@ void printLeaderboards(Player *players, uint8_t players_size) {
 	sortByPoints(players);
 	print_string(PLB_HEAD_Y, PLB_HEAD_X, 3, WHITE, CYAN, "NAME\0");
 	print_string(PLB_HEAD_Y, 2*PLB_HEAD_X, 3, WHITE, CYAN, "POINTS\0");
-	char tmp[2];
-	tmp[1] = '\0';
+	char tmp[5];
+	//tmp[4] = '\0';
 	for(uint8_t i = 0; i < players_size; i++) {
-		tmp[0] = players[i].points + '0';
+		sprintf(tmp, "%d\0", players[i].points);
 		print_string(PLB_Y + i*(4*BLANK_SPACE), PLB_X, 3, WHITE, CYAN, players[i].name);
 		print_string(PLB_Y + i*(4*BLANK_SPACE), PLB_X + 15*BLANK_SPACE, 3, WHITE, CYAN, tmp);
 	}
@@ -264,7 +281,7 @@ void drawStartButton() {
 }
 
 void drawNames(Player *players) {
-	char tmp[7+1+2+1+7]; //max first name, space, vs, space, max 2nd name //mozda 6 umjesto 7 al dobrop
+	char tmp[7+1+2+1+7]; //max first name, space, vs, space, max 2nd name //mozda 6 umjesto 7 al dobro
 	sprintf(tmp, "%s VS %s", players[cross_chosen].name, players[nought_chosen].name);
 	uint8_t offset_x = (MAX_Y - BLANK_SPACE - (BCK_BTN_X + BCK_BTN_W) - strlen(tmp) * CHAR_W * 2) / 2; //2 je FONT_SIZE, 220 -> sirina od kraja BCK_BTN do 310
 	print_string(BLANK_SPACE, (BCK_BTN_X + BCK_BTN_W) + offset_x, 2, WHITE, CYAN, tmp); //90 je kraj od bck btn,, mozda da je ime svako u svojoj boji ili kako oces
@@ -273,37 +290,33 @@ void drawNames(Player *players) {
 void drawGrid() {
 	//draw_rectangle(10+40-5, 110, 185, 185, WHITE);
 	
-	draw_v_line(GRID_STARTING_X + GRID_BLOCK_SIZE, GRID_STARTING_Y, GRID_STARTING_Y + GRID_RECT_SIZE, WHITE); //62=185/3
+	draw_v_line(GRID_STARTING_X + GRID_BLOCK_SIZE, GRID_STARTING_Y, GRID_STARTING_Y + GRID_RECT_SIZE, WHITE); //62~185/3
 	draw_v_line(GRID_STARTING_X + 2*GRID_BLOCK_SIZE, GRID_STARTING_Y, GRID_STARTING_Y + GRID_RECT_SIZE, WHITE);
 	
 	draw_h_line(GRID_STARTING_Y + GRID_BLOCK_SIZE, GRID_STARTING_X, GRID_STARTING_X + GRID_RECT_SIZE, WHITE);
 	draw_h_line(GRID_STARTING_Y + 2*GRID_BLOCK_SIZE, GRID_STARTING_X, GRID_STARTING_X + GRID_RECT_SIZE, WHITE);
+	
+	//my_drawCircle(GRID_STARTING_Y + GRID_BLOCK_SIZE + GRID_BLOCK_SIZE/2, GRID_STARTING_X + GRID_BLOCK_SIZE + GRID_BLOCK_SIZE/2, 30, WHITE);
 	
 }
 
 void drawTurn(Player *players) {
 	print_string(BCK_BTN_Y + BCK_BTN_H + 4*BLANK_SPACE, BCK_BTN_X, 3, WHITE, CYAN, "TURN:\0");
 	if(currentPlayer == CROSS) {
-		print_string(BCK_BTN_Y + BCK_BTN_H + 7*BLANK_SPACE, BCK_BTN_X, 2, players[cross_chosen].color, CYAN, players[cross_chosen].name); //napravit da se ispise ime onog koji je na redu, mozes to s nekom pomocnom varijablom
+		print_string(BCK_BTN_Y + BCK_BTN_H + 7*BLANK_SPACE, BCK_BTN_X, 2, CYAN, CYAN, players[nought_chosen].name); //prvo prebrise starog tj poboja mu i slova i pozadinu u boju pozadine (CYAN) zato jer ako jedan ima duze ime od drugog onda ce od tog koji ima duze ime slova od njegovog imena ce se i dalje vidit pored imena od ovog koji ima krace
+		print_string(BCK_BTN_Y + BCK_BTN_H + 7*BLANK_SPACE, BCK_BTN_X, 2, players[cross_chosen].color, CYAN, players[cross_chosen].name);
 	}else{
+		print_string(BCK_BTN_Y + BCK_BTN_H + 7*BLANK_SPACE, BCK_BTN_X, 2, CYAN, CYAN, players[cross_chosen].name); //prvo prebrise starog tj poboja mu i slova i pozadinu u boju pozadine (CYAN) zato jer ako jedan ima duze ime od drugog onda ce od tog koji ima duze ime slova od njegovog imena ce se i dalje vidit pored imena od ovog koji ima krace
 		print_string(BCK_BTN_Y + BCK_BTN_H + 7*BLANK_SPACE, BCK_BTN_X, 2, players[nought_chosen].color, CYAN, players[nought_chosen].name);
 	}
 }
 
 uint8_t drawOnGrid(uint8_t y, uint8_t x) { //skuzi kako ovo centrirat i napravi preko define-ova
 	if(currentPlayer == CROSS) { //nesto sa players[cross_chosen]
-		//print_string(y + 10, x + 10, 2, WHITE, CYAN, "X\0");
-		//draw_cross(y-5,x,62, WHITE); //bilo 62, 88 = sqrt(62**2 + 62**2) //treba podignut za 5 da bi bio tocno na sredini nez tocno zas
-		//draw_cross(y + y/20 - 5,x + x/20, 62-62/3, WHITE);
-		draw_cross(y + 11 - 5,x + 11 - 3, 62-62/3, RED); //skuzi malo kako ovo centrirat
-		//print_string(BCK_BTN_Y + BCK_BTN_H + 40, BCK_BTN_X, 3, WHITE, CYAN, "TURN:\0");
-		//print_string(BCK_BTN_Y + BCK_BTN_H + 40 + 50, BCK_BTN_X, 2, players[cross_chosen].color, CYAN, players[cross_chosen].name);
+		my_draw_cross(y + GRID_BLOCK_SIZE/2, x + GRID_BLOCK_SIZE/2, 25, RED);
 		return NOUGHT;
 	}else {
-		//print_string(y + 10, x + 10, 2, WHITE, CYAN, "O\0");
-		//print_string(BCK_BTN_Y + BCK_BTN_H + 40, BCK_BTN_X, 3, WHITE, CYAN, "TURN:\0");
-		//print_string(BCK_BTN_Y + BCK_BTN_H + 40 + 50, BCK_BTN_X, 2, players[nought_chosen].color, CYAN, players[nought_chosen].name);
-		draw_circle(y + 11 - 5 - 3, x + 11 - 3, 23, GREEN); //62/3   //skuzi malo kako ovo centrirat
+		adafruit_drawCircle(y + GRID_BLOCK_SIZE/2, x + GRID_BLOCK_SIZE/2, 25, GREEN);
 		return CROSS;
 	}
 }
@@ -328,19 +341,28 @@ void checkGameOver(Player *players) {
 		winner = board[1][1];
 	}
 	
-	if(gameOver) { //ovo preko define-ova
-		print_string(MAX_X-20-30-20, 10, 3, WHITE, CYAN, "WON:\0");
-		winner == CROSS ? print_string(MAX_X - 4*BLANK_SPACE, BLANK_SPACE, 2, players[cross_chosen].color, CYAN, players[cross_chosen].name) : print_string(MAX_X - 4*BLANK_SPACE, BLANK_SPACE, 2, players[nought_chosen].color, CYAN, players[nought_chosen].name);
+	if(gameOver) {
+		print_string(MAX_X - 10*BLANK_SPACE, BLANK_SPACE, 3, WHITE, CYAN, "WON:\0");
+		winner == CROSS ? print_string(MAX_X - 7*BLANK_SPACE, BLANK_SPACE, 2, players[cross_chosen].color, CYAN, players[cross_chosen].name) : print_string(MAX_X - 7*BLANK_SPACE, BLANK_SPACE, 2, players[nought_chosen].color, CYAN, players[nought_chosen].name);
 		winner == CROSS ? players[cross_chosen].points++ : players[nought_chosen].points++;
-		//if(winner == CROSS) {
-			//players[cross_chosen].points = 99;
-			//players[cross_chosen].name[0] = ':';
-			//change(&players[cross_chosen]);
-			//print_string(200, 200, 3, WHITE, CYAN, "DA NE");
-		//}
+		
+		uint8_t offset_x, offset_y;
+		
+		offset_x = (TRY_AGAIN_W - strlen("TRY AGAIN\0") * CHAR_W * 2) / 2;
+		offset_y = (TRY_AGAIN_H - 1 * CHAR_H * 2) / 2;
+		draw_rectangle(TRY_AGAIN_Y, TRY_AGAIN_X, TRY_AGAIN_H, TRY_AGAIN_W, WHITE);
+		print_string(TRY_AGAIN_Y + offset_y, TRY_AGAIN_X + 4, 2, WHITE, CYAN, "TRY AGAIN\0"); //sa offset x bude previse desno ne kuzim zasto ??
 	}else if(numberOfMoves == 9) {
 		//tie
-		print_string(MAX_X - 7*BLANK_SPACE, BLANK_SPACE, 3, WHITE, CYAN, "TIE\0");
+		gameOver = 1;
+		print_string(MAX_X - 9*BLANK_SPACE, BLANK_SPACE, 3, WHITE, CYAN, "TIE\0");
+		
+		uint8_t offset_x, offset_y;
+		
+		offset_x = (TRY_AGAIN_W - strlen("TRY AGAIN") * CHAR_W * 2) / 2;
+		offset_y = (TRY_AGAIN_H - 1 * CHAR_H * 2) / 2;
+		draw_rectangle(TRY_AGAIN_Y, TRY_AGAIN_X, TRY_AGAIN_H, TRY_AGAIN_W, WHITE);
+		print_string(TRY_AGAIN_Y + offset_y, TRY_AGAIN_X + 4, 2, WHITE, CYAN, "TRY AGAIN\0"); //sa offset0_x bude previse desno ne kuzim zasto ??
 	}
 	
 }
@@ -360,7 +382,7 @@ int main() {
 	char str[22] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'V', 'Z'};
 	//print_keyboard(str);
 	//Player players[4];
-	
+	uint8_t game_rerender = 1;
 	Player players[MAX_PLAYERS];
 	
 	Player p1; //ovo dinamicki radi
@@ -408,11 +430,14 @@ int main() {
 		// if screen is touched
 		if(currentPage == HOMESCREEN) {
 			//clrScr();
-			if(hs_first_enter) { //bez ovoga ostanu stvari od proslog page-a nez zas iako sam gore u back buttonu stavio clrScr()
+			if(hs_first_enter) { //bez ovoga ostanu stvari od proslog page-a nez zas iako sam gore u back buttonu stavio clrScr() ??
 				clrScr();
+				drawHomeScreen();
 				hs_first_enter = 0;
 			}
-			drawHomeScreen();
+			cp_rerender = 1;
+			game_rerender = 1;
+			//drawHomeScreen();
 			if(get_bit(PINB, T_IRQ) == 0) {
 				read_touch_coords(&TP_X, &TP_Y);
 				if(check_touch(TP_X, TP_Y, HS_S_Y, HS_S_X, HS_H, HS_W)) { //NEW_PLAYER
@@ -434,7 +459,7 @@ int main() {
 		}else if(currentPage == NEW_PLAYER) {
 			drawBackButton();
 			print_keyboard(str);
-			checkBackButtonPressed(&TP_X, &TP_Y, &currentPage, players);
+			checkBackButtonPressed(&TP_X, &TP_Y, &currentPage, players, &game_rerender);
 			drawDeleteButton();
 			drawOKButton();
 				
@@ -442,12 +467,12 @@ int main() {
 				read_touch_coords(&TP_X, &TP_Y);
 				for(uint8_t i = 0; i < 22; i++){ //strlen(str) ali on nekad baca gresku nez zas
 					if(check_touch(TP_X, TP_Y, KEY_Y + i/9 * (KEY_H + BLANK_SPACE/2), KEY_X + i%9*(BLANK_SPACE/2 + KEY_W), KEY_H, KEY_W)) { //stisnut neki key od keyboarda
-						if(newPlayerNameIndex == 6) break; //jer ime ima max 7 char-a
+						if(newPlayerNameIndex == (MAX_NAME_LENGTH-1)) break; //jer ime ima max 7 char-a, ako je == 6 (zadnji index) naci da je vec sve upisao jer na zadnji mora doc nulterm
 						clrScr();
 						newPlayerName[newPlayerNameIndex] = str[i];
 						newPlayerName[newPlayerNameIndex+1] = '\0';
 						newPlayerNameIndex++;
-						print_string(200, 10, 3, WHITE, CYAN, newPlayerName);
+						print_string(INPUT_NAME_Y, INPUT_NAME_X, 3, WHITE, CYAN, newPlayerName);
 						//_delay_ms(500); //da ne napravi previse ocitanja
 						break;
 					}
@@ -457,21 +482,22 @@ int main() {
 						newPlayerNameIndex--;
 						newPlayerName[newPlayerNameIndex] = '\0';
 						clrScr();
-						print_string(200, 10, 3, WHITE, CYAN, newPlayerName);
+						print_string(INPUT_NAME_Y, INPUT_NAME_X, 3, WHITE, CYAN, newPlayerName);
 					}else if(newPlayerNameIndex == 1){ //nema ni jedno slovo, stavim razmak jer inace ako je nulterm bude zbugano
 						newPlayerNameIndex--;
 						newPlayerName[newPlayerNameIndex] = ' ';
 						clrScr();
-						print_string(200, 10, 3, WHITE, CYAN, newPlayerName);
+						print_string(INPUT_NAME_Y, INPUT_NAME_X, 3, WHITE, CYAN, newPlayerName);
 					}
 					
 				}
 				
 				if(check_touch(TP_X, TP_Y, OK_BTN_Y, OK_BTN_X, OK_BTN_H, OK_BTN_W)) { //OK button
 					//create player i da se vrati na homescreen
-					if(players_size == 4 || !newPlayerNameIndex) continue; //ako je 4 igraca ili ako nista nije unio kao ime
+					if(players_size == MAX_PLAYERS || !newPlayerNameIndex) continue; //ako je 4 igraca ili ako nista nije unio kao ime
 					Player newPlayer;
 					//newPlayer.name = newPlayerName;
+					
 					for(uint8_t i = 0; i < strlen(newPlayerName); i++) { //morat ces reset-at newPlayerName i to --jesam
 						newPlayer.name[i] = newPlayerName[i];
 					}
@@ -489,9 +515,12 @@ int main() {
 			
 		}else if(currentPage == CHOOSE_PLAYER) {
 			drawBackButton();
-			checkBackButtonPressed(&TP_X, &TP_Y, &currentPage, players);
-			showPlayers(players, players_size);
-			drawStartButton();
+			checkBackButtonPressed(&TP_X, &TP_Y, &currentPage, players, &game_rerender);
+			if(cp_rerender) { //tako da ne radi stalno rerender ako se nista nije promjenilo, puno je responzivnije na ovaj nacin
+				showPlayers(players, players_size);
+				drawStartButton();
+				cp_rerender = 0;	
+			}
 			
 			if (get_bit(PINB, T_IRQ) == 0) {
 				read_touch_coords(&TP_X, &TP_Y);
@@ -499,60 +528,80 @@ int main() {
 				for(uint8_t i = 0; i < players_size; i++) {
 					tmp = i > 1 ? 50 : 0;
 					if(check_touch(TP_X, TP_Y, SP_BTN_Y + tmp, SP_BTN_X + (i%2)*(SP_BTN_W + BLANK_SPACE), SP_BTN_H, SP_BTN_W)) { //skuzi zasto poboja cijeli stupac ako gornjeg stisnes, a nista ako donjeg --jer ti je tmp bio izvan petlje
-						if(players[i].color == WHITE && cross_chosen == 5) {
+						if(players[i].color == WHITE && cross_chosen == NONE) {
 							players[i].color = RED;
 							players[i].clicked = 1;
 							cross_chosen = i;
-						}else if(players[i].color == WHITE && cross_chosen != 5 && nought_chosen == 5) {
+						}else if(players[i].color == WHITE && cross_chosen != 5 && nought_chosen == NONE) {
 							players[i].color = GREEN;
 							players[i].clicked = 1;
 							nought_chosen = i;
 						}else if(players[i].color == RED) {
 							players[i].color = WHITE;
-							cross_chosen = 5;
+							cross_chosen = NONE;
 							players[i].clicked = 0;
 						}else if(players[i].color == GREEN) {
 							players[i].color = WHITE;
-							nought_chosen = 5;
+							nought_chosen = NONE;
 							players[i].clicked = 0;
 						}
 						_delay_ms(50); //da ne napravi 2 ocitanja
+						cp_rerender = 1;
 						break;
 					}
 				}
 				
 				if(check_touch(TP_X, TP_Y, START_BTN_Y, START_BTN_X, START_BTN_H, START_BTN_W)) {
-					if(cross_chosen != 5 && nought_chosen != 5){ //ne moze uc u game ako nije odabrao dvojicu
+					if(cross_chosen != NONE && nought_chosen != NONE){ //ne moze uc u game ako nije odabrao dvojicu
 						clrScr();
 						currentPage = GAME;
+						game_rerender = 1; //dok ovo nisam napravio, prvi put nakon sta si stisnuo back i usao u GAME ovo bi bilo 0 iako se unutar checkBackButton to stavi na 1 ?????
 					}
 				}
 			}
 		}else if(currentPage == LEADERBOARDS) {
 			drawBackButton();
-			checkBackButtonPressed(&TP_X, &TP_Y, &currentPage, players);
+			checkBackButtonPressed(&TP_X, &TP_Y, &currentPage, players, &game_rerender);
 			//printLeaderboards(players, sizeof(players) / sizeof(players[0])); //moras prije nego saljes u funkciju jer se u funkciju salje samo pointer, ali ovo ce ti poslat za koliko njih je alocirano mjesta, a ne koliko ih je stvarno unutra
 			printLeaderboards(players, players_size);
 		}else if(currentPage == GAME) {
 			drawBackButton();
-			checkBackButtonPressed(&TP_X, &TP_Y, &currentPage, players);
+			checkBackButtonPressed(&TP_X, &TP_Y, &currentPage, players, &game_rerender);
 			//print_string(200, 200, 3, WHITE, CYAN, "BOK\0"); //maknut
-			drawNames(players);
-			drawGrid();
+			//drawNames(players);
+			//drawGrid();
+			//char tmp[2];
+			//sprintf(tmp, "%d\0", game_rerender);
+			//print_string(200, 10, 2, WHITE, CYAN, tmp);
+			if(gameOver && check_touch(TP_X, TP_Y, TRY_AGAIN_Y, TRY_AGAIN_X, TRY_AGAIN_H, TRY_AGAIN_W)) { //TRY AGAIN
+				resetGame();
+				clrScr();
+				game_rerender = 1;
+			}
 			
 			if(gameOver) continue;
 			
-			checkGameOver(players); //ide ispod ovog if-a tako da se ne vrti bezveze ako je gotovo
-			drawTurn(players);		
+			if(game_rerender) { //da se rerendera tek kad se desi promjena, ne znam zasto se ne rendera kad prvi put udes unutra nakon sta si BACK button stisnuo, ako ne uspijes rjesit onda pusti bez ovog if-a pa ce bit malo manje responzivno --uspio
+				drawNames(players); //zbog nekog razloga kad ude tu ponovo vrijednost od game_rerender je 0 ??? --uspio ali svejedno ne kuzim zasto se to desava ??
+				drawGrid();
+				checkGameOver(players); //ide ispod ovog if-a tako da se ne vrti bezveze ako je gotovo
+				drawTurn(players);
+				game_rerender = 0;
+			}
+			
+			//checkGameOver(players); //ide ispod ovog if-a tako da se ne vrti bezveze ako je gotovo
+			//drawTurn(players);		
 			if (get_bit(PINB, T_IRQ) == 0) {
 				read_touch_coords(&TP_X, &TP_Y);
 				for(uint8_t i = 0; i < 3; i++) {
 					for(uint8_t j = 0; j < 3; j++) {
-						if(check_touch(TP_X, TP_Y, 10+45-5 + j*62, 110 + i*62, 62, 62)) {
+						if(check_touch(TP_X, TP_Y, GRID_STARTING_Y + j*GRID_BLOCK_SIZE, GRID_STARTING_X + i*GRID_BLOCK_SIZE, GRID_BLOCK_SIZE, GRID_BLOCK_SIZE)) {
 							if(board[i][j] == EMPTY) { //ovo sa konstantama
 								board[i][j] = currentPlayer; //ovo mozes da je 1 ili 2 s obzirom dal je X iil O
 								numberOfMoves++;
-								currentPlayer = drawOnGrid(10+45-5 + j*62, 110 + i*62); //y i x koordinate gornjeg lijevog kuta kvadrata na koji je stisnuo
+								currentPlayer = drawOnGrid(GRID_STARTING_Y + j*GRID_BLOCK_SIZE, GRID_STARTING_X + i*GRID_BLOCK_SIZE); //y i x koordinate gornjeg lijevog kuta kvadrata na koji je stisnuo
+								game_rerender = 1;
+								break;
 							}
 						}
 					}
