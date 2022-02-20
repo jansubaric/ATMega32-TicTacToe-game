@@ -272,7 +272,7 @@ END GROUP
 .rela.plt
  *(.rela.plt)
 
-.text           0x00000000     0x27fc
+.text           0x00000000     0x266e
  *(.vectors)
  .vectors       0x00000000       0x54 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.2.209/gcc/dev/atmega32a/avr5/crtatmega32a.o
                 0x00000000                __vector_default
@@ -415,96 +415,96 @@ END GROUP
                 0x00000c90       0x44 main.o
                 0x00000c90                _Z11check_touchjjjjjj
  .text._Z14print_keyboardPc
-                0x00000cd4       0xfa main.o
+                0x00000cd4       0xe4 main.o
                 0x00000cd4                _Z14print_keyboardPc
  .text._Z14drawHomeScreenv
-                0x00000dce       0xc0 main.o
-                0x00000dce                _Z14drawHomeScreenv
+                0x00000db8       0xc0 main.o
+                0x00000db8                _Z14drawHomeScreenv
  .text._Z14drawBackButtonv
-                0x00000e8e       0x4c main.o
-                0x00000e8e                _Z14drawBackButtonv
+                0x00000e78       0x4c main.o
+                0x00000e78                _Z14drawBackButtonv
  .text._Z6clrScrv
-                0x00000eda        0xa main.o
-                0x00000eda                _Z6clrScrv
+                0x00000ec4        0xa main.o
+                0x00000ec4                _Z6clrScrv
  .text._Z18resetNewPlayerNamev
-                0x00000ee4       0x32 main.o
-                0x00000ee4                _Z18resetNewPlayerNamev
+                0x00000ece       0x32 main.o
+                0x00000ece                _Z18resetNewPlayerNamev
  .text._Z18resetPlayersColorsP6Player
-                0x00000f16       0x2c main.o
-                0x00000f16                _Z18resetPlayersColorsP6Player
+                0x00000f00       0x2c main.o
+                0x00000f00                _Z18resetPlayersColorsP6Player
  .text._Z9resetGamev
-                0x00000f42       0x1e main.o
-                0x00000f42                _Z9resetGamev
+                0x00000f2c       0x1e main.o
+                0x00000f2c                _Z9resetGamev
  .text._Z22checkBackButtonPressedPjS_PhP6PlayerS0_
-                0x00000f60       0x9a main.o
-                0x00000f60                _Z22checkBackButtonPressedPjS_PhP6PlayerS0_
+                0x00000f4a       0xa0 main.o
+                0x00000f4a                _Z22checkBackButtonPressedPjS_PhP6PlayerS0_
  .text._Z12sortByPointsP6Player
-                0x00000ffa       0xf2 main.o
-                0x00000ffa                _Z12sortByPointsP6Player
+                0x00000fea       0xf2 main.o
+                0x00000fea                _Z12sortByPointsP6Player
  .text._Z17printLeaderboardsP6Playerh
-                0x000010ec      0x128 main.o
-                0x000010ec                _Z17printLeaderboardsP6Playerh
+                0x000010dc      0x128 main.o
+                0x000010dc                _Z17printLeaderboardsP6Playerh
  .text._Z11showPlayersP6Playerh
-                0x00001214      0x104 main.o
-                0x00001214                _Z11showPlayersP6Playerh
+                0x00001204      0x104 main.o
+                0x00001204                _Z11showPlayersP6Playerh
  .text._Z12drawOKButtonv
-                0x00001318       0x4c main.o
-                0x00001318                _Z12drawOKButtonv
+                0x00001308       0x4c main.o
+                0x00001308                _Z12drawOKButtonv
  .text._Z16drawDeleteButtonv
-                0x00001364       0x4c main.o
-                0x00001364                _Z16drawDeleteButtonv
+                0x00001354       0x4c main.o
+                0x00001354                _Z16drawDeleteButtonv
  .text._Z15drawStartButtonv
-                0x000013b0       0x4c main.o
-                0x000013b0                _Z15drawStartButtonv
+                0x000013a0       0x4c main.o
+                0x000013a0                _Z15drawStartButtonv
  .text._Z9drawNamesP6Player
-                0x000013fc       0xca main.o
-                0x000013fc                _Z9drawNamesP6Player
+                0x000013ec       0xca main.o
+                0x000013ec                _Z9drawNamesP6Player
  .text._Z8drawGridv
-                0x000014c6       0x52 main.o
-                0x000014c6                _Z8drawGridv
+                0x000014b6       0x52 main.o
+                0x000014b6                _Z8drawGridv
  .text._Z8drawTurnP6Player
-                0x00001518       0xf8 main.o
-                0x00001518                _Z8drawTurnP6Player
+                0x00001508       0xf8 main.o
+                0x00001508                _Z8drawTurnP6Player
  .text._Z10drawOnGridhh
-                0x00001610       0x3c main.o
-                0x00001610                _Z10drawOnGridhh
+                0x00001600       0x3c main.o
+                0x00001600                _Z10drawOnGridhh
  .text._Z13checkGameOverP6Player
-                0x0000164c      0x252 main.o
-                0x0000164c                _Z13checkGameOverP6Player
- .text.main     0x0000189e      0x968 main.o
-                0x0000189e                main
+                0x0000163c      0x252 main.o
+                0x0000163c                _Z13checkGameOverP6Player
+ .text.main     0x0000188e      0x7ea main.o
+                0x0000188e                main
  .text.libgcc.mul
-                0x00002206       0x1e c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_umulhisi3.o)
-                0x00002206                __umulhisi3
+                0x00002078       0x1e c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_umulhisi3.o)
+                0x00002078                __umulhisi3
  .text.avr-libc
-                0x00002224       0x44 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr5\libc.a(sprintf.o)
-                0x00002224                sprintf
+                0x00002096       0x44 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr5\libc.a(sprintf.o)
+                0x00002096                sprintf
  .text.avr-libc
-                0x00002268      0x3c2 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr5\libc.a(vfprintf_std.o)
-                0x00002268                vfprintf
+                0x000020da      0x3c2 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr5\libc.a(vfprintf_std.o)
+                0x000020da                vfprintf
  .text.avr-libc
-                0x0000262a       0x16 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr5\libc.a(strnlen_P.o)
-                0x0000262a                strnlen_P
+                0x0000249c       0x16 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr5\libc.a(strnlen_P.o)
+                0x0000249c                strnlen_P
  .text.avr-libc
-                0x00002640       0x16 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr5\libc.a(strnlen.o)
-                0x00002640                strnlen
+                0x000024b2       0x16 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr5\libc.a(strnlen.o)
+                0x000024b2                strnlen
  .text.avr-libc
-                0x00002656       0x78 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr5\libc.a(fputc.o)
-                0x00002656                fputc
+                0x000024c8       0x78 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr5\libc.a(fputc.o)
+                0x000024c8                fputc
  .text.avr-libc
-                0x000026ce       0xbc c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr5\libc.a(ultoa_invert.o)
-                0x000026ce                __ultoa_invert
+                0x00002540       0xbc c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr5\libc.a(ultoa_invert.o)
+                0x00002540                __ultoa_invert
  .text.libgcc.prologue
-                0x0000278a       0x38 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_prologue.o)
-                0x0000278a                __prologue_saves__
+                0x000025fc       0x38 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_prologue.o)
+                0x000025fc                __prologue_saves__
  .text.libgcc.prologue
-                0x000027c2       0x36 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_epilogue.o)
-                0x000027c2                __epilogue_restores__
-                0x000027f8                . = ALIGN (0x2)
+                0x00002634       0x36 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_epilogue.o)
+                0x00002634                __epilogue_restores__
+                0x0000266a                . = ALIGN (0x2)
  *(.fini9)
- .fini9         0x000027f8        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
-                0x000027f8                _exit
-                0x000027f8                exit
+ .fini9         0x0000266a        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
+                0x0000266a                _exit
+                0x0000266a                exit
  *(.fini9)
  *(.fini8)
  *(.fini8)
@@ -523,32 +523,32 @@ END GROUP
  *(.fini1)
  *(.fini1)
  *(.fini0)
- .fini0         0x000027f8        0x4 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
+ .fini0         0x0000266a        0x4 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
  *(.fini0)
-                0x000027fc                _etext = .
+                0x0000266e                _etext = .
 
-.data           0x00800060      0x15c load address 0x000027fc
+.data           0x00800060      0x15c load address 0x0000266e
                 0x00800060                PROVIDE (__data_start, .)
  *(.data)
  *(.data*)
  .data.currentPlayer
                 0x00800060        0x1 main.o
                 0x00800060                currentPlayer
- .data.cp_rerender
+ .data.np_rerender
                 0x00800061        0x1 main.o
-                0x00800061                cp_rerender
- .data.hs_first_enter
+                0x00800061                np_rerender
+ .data.cp_rerender
                 0x00800062        0x1 main.o
-                0x00800062                hs_first_enter
- .data.nought_chosen
+                0x00800062                cp_rerender
+ .data.hs_first_enter
                 0x00800063        0x1 main.o
-                0x00800063                nought_chosen
- .data.cross_chosen
+                0x00800063                hs_first_enter
+ .data.nought_chosen
                 0x00800064        0x1 main.o
-                0x00800064                cross_chosen
- .data.players_size
+                0x00800064                nought_chosen
+ .data.cross_chosen
                 0x00800065        0x1 main.o
-                0x00800065                players_size
+                0x00800065                cross_chosen
  .data.newPlayerName
                 0x00800066        0x7 main.o
                 0x00800066                newPlayerName
@@ -565,7 +565,7 @@ END GROUP
                 0x008001bc                _edata = .
                 0x008001bc                PROVIDE (__data_end, .)
 
-.bss            0x008001bc        0xc
+.bss            0x008001bc        0xd
                 0x008001bc                PROVIDE (__bss_start, .)
  *(.bss)
  *(.bss*)
@@ -576,19 +576,22 @@ END GROUP
                 0x008001bd                gameOver
  .bss.board     0x008001be        0x9 main.o
                 0x008001be                board
- .bss.newPlayerNameIndex
+ .bss.players_size
                 0x008001c7        0x1 main.o
-                0x008001c7                newPlayerNameIndex
+                0x008001c7                players_size
+ .bss.newPlayerNameIndex
+                0x008001c8        0x1 main.o
+                0x008001c8                newPlayerNameIndex
  *(COMMON)
-                0x008001c8                PROVIDE (__bss_end, .)
-                0x000027fc                __data_load_start = LOADADDR (.data)
-                0x00002958                __data_load_end = (__data_load_start + SIZEOF (.data))
+                0x008001c9                PROVIDE (__bss_end, .)
+                0x0000266e                __data_load_start = LOADADDR (.data)
+                0x000027ca                __data_load_end = (__data_load_start + SIZEOF (.data))
 
-.noinit         0x008001c8        0x0
+.noinit         0x008001c9        0x0
                 [!provide]                PROVIDE (__noinit_start, .)
  *(.noinit*)
                 [!provide]                PROVIDE (__noinit_end, .)
-                0x008001c8                _end = .
+                0x008001c9                _end = .
                 [!provide]                PROVIDE (__heap_start, .)
 
 .eeprom         0x00810000        0x0
@@ -665,34 +668,34 @@ END GROUP
 .debug_pubnames
  *(.debug_pubnames)
 
-.debug_info     0x00000000     0x4611
+.debug_info     0x00000000     0x4549
  *(.debug_info .gnu.linkonce.wi.*)
  .debug_info    0x00000000      0x4e6 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.2.209/gcc/dev/atmega32a/avr5/crtatmega32a.o
- .debug_info    0x000004e6     0x412b main.o
+ .debug_info    0x000004e6     0x4063 main.o
 
 .debug_abbrev   0x00000000      0x858
  *(.debug_abbrev)
  .debug_abbrev  0x00000000      0x4a3 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.2.209/gcc/dev/atmega32a/avr5/crtatmega32a.o
  .debug_abbrev  0x000004a3      0x3b5 main.o
 
-.debug_line     0x00000000     0x152e
+.debug_line     0x00000000     0x14b8
  *(.debug_line .debug_line.* .debug_line_end)
  .debug_line    0x00000000      0x115 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.2.209/gcc/dev/atmega32a/avr5/crtatmega32a.o
- .debug_line    0x00000115     0x1419 main.o
+ .debug_line    0x00000115     0x13a3 main.o
 
-.debug_frame    0x00000000      0x878
+.debug_frame    0x00000000      0x870
  *(.debug_frame)
- .debug_frame   0x00000000      0x878 main.o
+ .debug_frame   0x00000000      0x870 main.o
 
-.debug_str      0x00000000      0xa94
+.debug_str      0x00000000      0xaa0
  *(.debug_str)
  .debug_str     0x00000000      0x196 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.2.209/gcc/dev/atmega32a/avr5/crtatmega32a.o
- .debug_str     0x00000196      0x8fe main.o
-                                0x95d (size before relaxing)
+ .debug_str     0x00000196      0x90a main.o
+                                0x969 (size before relaxing)
 
-.debug_loc      0x00000000     0x3729
+.debug_loc      0x00000000     0x35c0
  *(.debug_loc)
- .debug_loc     0x00000000     0x3729 main.o
+ .debug_loc     0x00000000     0x35c0 main.o
 
 .debug_macinfo
  *(.debug_macinfo)

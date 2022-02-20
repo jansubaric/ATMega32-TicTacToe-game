@@ -57,8 +57,10 @@
 
 #define KEY_Y 70 //key od keyboard
 #define KEY_X 10
-#define KEY_H 30
-#define KEY_W 30
+#define KEY_H 32
+#define KEY_W 32
+
+#define KEYS_IN_ONE_ROW (MAX_Y / (KEY_W + BLANK_SPACE/2)) //max_y je zapravo max_x u landscape nacinu
 
 #define CHAR_H 8 //char height
 #define CHAR_W 5 //char width
@@ -90,34 +92,20 @@
 char newPlayerName[7] = {' '}; //6+nulterm
 //newPlayerName[6] = '\0';
 uint8_t newPlayerNameIndex = 0;
-struct Player {
-	//Player() {
-	//points = 0;
-	//}
-	
+struct Player {	
 	uint8_t points;
 	uint16_t color;
 	uint8_t clicked;
 	char name[MAX_NAME_LENGTH]; //6 + nulterm
 };
 
-//class Player {
-	////Player() {
-	////points = 0;
-	////}
-	//public:
-		//uint8_t points;
-		//uint16_t color;
-		//uint8_t clicked;
-		//char name[7]; //6 + nulterm
-//};
-
 //Player players[4];
-uint8_t players_size = 4; //stavi u 0 poslije
-//uint8_t players_size = 0; //stavi u 0 poslije
+//uint8_t players_size = 4; //stavi u 0 poslije
+uint8_t players_size = 0; //stavi u 0 poslije
 uint8_t cross_chosen = NONE, nought_chosen = NONE; //5 je kao nista nije odabrano, ne mozes -1 jer je unsigned int
 uint8_t hs_first_enter = 1; //home screen
 uint8_t cp_rerender = 1; //choose player
+uint8_t np_rerender = 1; //new player (to jest za keyboard)
 //uint8_t game_rerender = 1;
 uint8_t board[3][3] = {0};
 
@@ -131,15 +119,14 @@ uint8_t numberOfMoves = 0;
 
 void print_keyboard(char str[]) {
 	uint8_t offset_x, offset_y;
-	//char *str = "ABCDEFGHIJKLMNJOPRSTUVZ";
-	//char str[] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'V', 'Z'};
+	
 	offset_x = (KEY_W - 1 * CHAR_W * FONT_SIZE) / 2;
 	offset_y = (KEY_H - 1 * CHAR_H * FONT_SIZE) / 2;
 	char tmp[2];
-	for(uint8_t i = 0; i < 22; i++) { //ako stavim strlen(str) onda napise jos 3 neka cudna char-a, a ko stavim 22 sve okej
+	for(uint8_t i = 0; i < 22; i++) { //ako stavim strlen(str) onda napise jos 3 neka cudna char-a, a ko stavim 22 sve okej ??
 		sprintf(tmp, "%c\0", str[i]);
-		draw_rectangle(KEY_Y + i/9 * (KEY_H + BLANK_SPACE/2), KEY_X + i%9*(BLANK_SPACE/2 + KEY_W), KEY_H, KEY_W, WHITE);
-		print_string(KEY_Y + offset_y + i/9 * (KEY_H + BLANK_SPACE / 2), KEY_X + i%9*(KEY_W + BLANK_SPACE / 2) + offset_x, 3, WHITE, CYAN, tmp);
+		draw_rectangle(KEY_Y + i/KEYS_IN_ONE_ROW * (KEY_H + BLANK_SPACE/2), KEY_X + i%KEYS_IN_ONE_ROW * (BLANK_SPACE/2 + KEY_W), KEY_H, KEY_W, WHITE);
+		print_string(KEY_Y + offset_y + i/KEYS_IN_ONE_ROW * (KEY_H + BLANK_SPACE / 2), KEY_X + i%KEYS_IN_ONE_ROW *(KEY_W + BLANK_SPACE / 2) + offset_x, 3, WHITE, CYAN, tmp);
 	}
 }
 
@@ -206,6 +193,7 @@ void checkBackButtonPressed(uint16_t *TP_X, uint16_t *TP_Y, uint8_t *currentPage
 			//_delay_ms(10);
 			if(*currentPage == NEW_PLAYER) { //ako je bio u NEW PLAYER da cleara
 				resetNewPlayerName();
+				np_rerender = 1;
 			}else if(*currentPage == CHOOSE_PLAYER || *currentPage == GAME) { //ako je bio u CHOOSE PLAYER ili u GAME
 				resetPlayersColors(players);
 				resetGame();
@@ -288,7 +276,6 @@ void drawNames(Player *players) {
 }
 
 void drawGrid() {
-	//draw_rectangle(10+40-5, 110, 185, 185, WHITE);
 	
 	draw_v_line(GRID_STARTING_X + GRID_BLOCK_SIZE, GRID_STARTING_Y, GRID_STARTING_Y + GRID_RECT_SIZE, WHITE); //62~185/3
 	draw_v_line(GRID_STARTING_X + 2*GRID_BLOCK_SIZE, GRID_STARTING_Y, GRID_STARTING_Y + GRID_RECT_SIZE, WHITE);
@@ -296,8 +283,7 @@ void drawGrid() {
 	draw_h_line(GRID_STARTING_Y + GRID_BLOCK_SIZE, GRID_STARTING_X, GRID_STARTING_X + GRID_RECT_SIZE, WHITE);
 	draw_h_line(GRID_STARTING_Y + 2*GRID_BLOCK_SIZE, GRID_STARTING_X, GRID_STARTING_X + GRID_RECT_SIZE, WHITE);
 	
-	//my_drawCircle(GRID_STARTING_Y + GRID_BLOCK_SIZE + GRID_BLOCK_SIZE/2, GRID_STARTING_X + GRID_BLOCK_SIZE + GRID_BLOCK_SIZE/2, 30, WHITE);
-	
+	//my_drawCircle(GRID_STARTING_Y + GRID_BLOCK_SIZE + GRID_BLOCK_SIZE/2, GRID_STARTING_X + GRID_BLOCK_SIZE + GRID_BLOCK_SIZE/2, 30, WHITE);	
 }
 
 void drawTurn(Player *players) {
@@ -313,10 +299,10 @@ void drawTurn(Player *players) {
 
 uint8_t drawOnGrid(uint8_t y, uint8_t x) { //skuzi kako ovo centrirat i napravi preko define-ova
 	if(currentPlayer == CROSS) { //nesto sa players[cross_chosen]
-		my_draw_cross(y + GRID_BLOCK_SIZE/2, x + GRID_BLOCK_SIZE/2, 25, RED);
+		my_draw_cross(y + GRID_BLOCK_SIZE/2, x + GRID_BLOCK_SIZE/2, 20, RED);
 		return NOUGHT;
 	}else {
-		adafruit_drawCircle(y + GRID_BLOCK_SIZE/2, x + GRID_BLOCK_SIZE/2, 25, GREEN);
+		adafruit_drawCircle(y + GRID_BLOCK_SIZE/2, x + GRID_BLOCK_SIZE/2, 20, GREEN);
 		return CROSS;
 	}
 }
@@ -385,46 +371,46 @@ int main() {
 	uint8_t game_rerender = 1;
 	Player players[MAX_PLAYERS];
 	
-	Player p1; //ovo dinamicki radi
-	p1.points = 0;
-	for(uint8_t j = 0; j < 7; j++) {
-		p1.name[j] = 'A';
-	}
-	p1.name[6] = '\0';
-	p1.clicked = 0;
-	p1.color = WHITE;
-	
-	Player p2;
-	p2.points = 2;
-	for(uint8_t j = 0; j < 7; j++) {
-		p2.name[j] = 'B';
-	}
-	p2.name[6] = '\0';
-	p2.clicked = 1;
-	p2.color = WHITE;
-	
-	Player p3;
-	p3.points = 7;
-	for(uint8_t j = 0; j < 7; j++) {
-		p3.name[j] = 'C';
-	}
-	p3.name[6] = '\0';
-	p3.clicked = 0;
-	p3.color = WHITE;
-	
-	Player p4;
-	p4.points = 4;
-	for(uint8_t j = 0; j < 7; j++) {
-		p4.name[j] = 'D';
-	}
-	p4.name[6] = '\0';
-	p4.clicked = 0;
-	p4.color = WHITE;
-	
-	players[0] = p1;
-	players[1] = p2;
-	players[2] = p3;
-	players[3] = p4;
+	//Player p1; //ovo dinamicki radi
+	//p1.points = 0;
+	//for(uint8_t j = 0; j < 7; j++) {
+		//p1.name[j] = 'A';
+	//}
+	//p1.name[6] = '\0';
+	//p1.clicked = 0;
+	//p1.color = WHITE;
+	//
+	//Player p2;
+	//p2.points = 2;
+	//for(uint8_t j = 0; j < 7; j++) {
+		//p2.name[j] = 'B';
+	//}
+	//p2.name[6] = '\0';
+	//p2.clicked = 1;
+	//p2.color = WHITE;
+	//
+	//Player p3;
+	//p3.points = 7;
+	//for(uint8_t j = 0; j < 7; j++) {
+		//p3.name[j] = 'C';
+	//}
+	//p3.name[6] = '\0';
+	//p3.clicked = 0;
+	//p3.color = WHITE;
+	//
+	//Player p4;
+	//p4.points = 4;
+	//for(uint8_t j = 0; j < 7; j++) {
+		//p4.name[j] = 'D';
+	//}
+	//p4.name[6] = '\0';
+	//p4.clicked = 0;
+	//p4.color = WHITE;
+	//
+	//players[0] = p1;
+	//players[1] = p2;
+	//players[2] = p3;
+	//players[3] = p4;
 	
 	while (1) {
 		// if screen is touched
@@ -443,6 +429,7 @@ int main() {
 				if(check_touch(TP_X, TP_Y, HS_S_Y, HS_S_X, HS_H, HS_W)) { //NEW_PLAYER
 					clrScr();
 					hs_first_enter = 1;
+					np_rerender = 1;
 					currentPage = NEW_PLAYER;
 				}
 				if(check_touch(TP_X, TP_Y, CP_Y, CP_X, CP_H, CP_W)) { //CHOOSE_PLAYER
@@ -457,16 +444,23 @@ int main() {
 				}
 			}
 		}else if(currentPage == NEW_PLAYER) {
-			drawBackButton();
-			print_keyboard(str);
+			//drawBackButton();
+			//print_keyboard(str); //stavi da se ponovo rendera tek kad dode do promjene
 			checkBackButtonPressed(&TP_X, &TP_Y, &currentPage, players, &game_rerender);
-			drawDeleteButton();
-			drawOKButton();
+			//drawDeleteButton();
+			//drawOKButton();
+			if(np_rerender) {
+				drawBackButton();
+				print_keyboard(str); //stavi da se ponovo rendera tek kad dode do promjene
+				drawDeleteButton();
+				drawOKButton();
+				np_rerender = 0;
+			}
 				
 			if(get_bit(PINB, T_IRQ) == 0) {
 				read_touch_coords(&TP_X, &TP_Y);
 				for(uint8_t i = 0; i < 22; i++){ //strlen(str) ali on nekad baca gresku nez zas
-					if(check_touch(TP_X, TP_Y, KEY_Y + i/9 * (KEY_H + BLANK_SPACE/2), KEY_X + i%9*(BLANK_SPACE/2 + KEY_W), KEY_H, KEY_W)) { //stisnut neki key od keyboarda
+					if(check_touch(TP_X, TP_Y, KEY_Y + i/KEYS_IN_ONE_ROW * (KEY_H + BLANK_SPACE/2), KEY_X + i%KEYS_IN_ONE_ROW*(BLANK_SPACE/2 + KEY_W), KEY_H, KEY_W)) { //stisnut neki key od keyboarda
 						if(newPlayerNameIndex == (MAX_NAME_LENGTH-1)) break; //jer ime ima max 7 char-a, ako je == 6 (zadnji index) naci da je vec sve upisao jer na zadnji mora doc nulterm
 						clrScr();
 						newPlayerName[newPlayerNameIndex] = str[i];
@@ -474,10 +468,11 @@ int main() {
 						newPlayerNameIndex++;
 						print_string(INPUT_NAME_Y, INPUT_NAME_X, 3, WHITE, CYAN, newPlayerName);
 						//_delay_ms(500); //da ne napravi previse ocitanja
+						np_rerender = 1;
 						break;
 					}
 				}
-				if(check_touch(TP_X, TP_Y, DEL_BTN_Y, DEL_BTN_X, DEL_BTN_H, DEL_BTN_W)) {
+				if(check_touch(TP_X, TP_Y, DEL_BTN_Y, DEL_BTN_X, DEL_BTN_H, DEL_BTN_W)) { //delete button
 					if(newPlayerNameIndex > 1) { //znaci da ima jedno slovo, npr A\0
 						newPlayerNameIndex--;
 						newPlayerName[newPlayerNameIndex] = '\0';
@@ -489,7 +484,7 @@ int main() {
 						clrScr();
 						print_string(INPUT_NAME_Y, INPUT_NAME_X, 3, WHITE, CYAN, newPlayerName);
 					}
-					
+					np_rerender = 1;
 				}
 				
 				if(check_touch(TP_X, TP_Y, OK_BTN_Y, OK_BTN_X, OK_BTN_H, OK_BTN_W)) { //OK button
@@ -509,14 +504,15 @@ int main() {
 					players_size++;
 					resetNewPlayerName();
 					clrScr();
+					np_rerender = 1;
 					currentPage = HOMESCREEN;
 				}
 			}
 			
 		}else if(currentPage == CHOOSE_PLAYER) {
-			drawBackButton();
 			checkBackButtonPressed(&TP_X, &TP_Y, &currentPage, players, &game_rerender);
 			if(cp_rerender) { //tako da ne radi stalno rerender ako se nista nije promjenilo, puno je responzivnije na ovaj nacin
+				drawBackButton();
 				showPlayers(players, players_size);
 				drawStartButton();
 				cp_rerender = 0;	
@@ -565,7 +561,7 @@ int main() {
 			//printLeaderboards(players, sizeof(players) / sizeof(players[0])); //moras prije nego saljes u funkciju jer se u funkciju salje samo pointer, ali ovo ce ti poslat za koliko njih je alocirano mjesta, a ne koliko ih je stvarno unutra
 			printLeaderboards(players, players_size);
 		}else if(currentPage == GAME) {
-			drawBackButton();
+			//drawBackButton();
 			checkBackButtonPressed(&TP_X, &TP_Y, &currentPage, players, &game_rerender);
 			//print_string(200, 200, 3, WHITE, CYAN, "BOK\0"); //maknut
 			//drawNames(players);
@@ -582,6 +578,7 @@ int main() {
 			if(gameOver) continue;
 			
 			if(game_rerender) { //da se rerendera tek kad se desi promjena, ne znam zasto se ne rendera kad prvi put udes unutra nakon sta si BACK button stisnuo, ako ne uspijes rjesit onda pusti bez ovog if-a pa ce bit malo manje responzivno --uspio
+				drawBackButton();
 				drawNames(players); //zbog nekog razloga kad ude tu ponovo vrijednost od game_rerender je 0 ??? --uspio ali svejedno ne kuzim zasto se to desava ??
 				drawGrid();
 				checkGameOver(players); //ide ispod ovog if-a tako da se ne vrti bezveze ako je gotovo
