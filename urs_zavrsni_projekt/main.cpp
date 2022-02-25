@@ -89,7 +89,7 @@
 
 #define NONE 5
 
-char newPlayerName[7] = {' '}; //6+nulterm
+char newPlayerName[MAX_NAME_LENGTH] = {' '}; //6+nulterm
 uint8_t newPlayerNameIndex = 0;
 struct Player {	
 	uint8_t points;
@@ -337,7 +337,7 @@ void checkGameOver(Player *players) {
 		offset_x = (TRY_AGAIN_W - strlen("TRY AGAIN") * CHAR_W * 2) / 2;
 		offset_y = (TRY_AGAIN_H - 1 * CHAR_H * 2) / 2;
 		draw_rectangle(TRY_AGAIN_Y, TRY_AGAIN_X, TRY_AGAIN_H, TRY_AGAIN_W, WHITE);
-		print_string(TRY_AGAIN_Y + offset_y, TRY_AGAIN_X + 4, 2, WHITE, CYAN, "TRY AGAIN\0"); //sa offset0_x bude previse desno ne kuzim zasto ??
+		print_string(TRY_AGAIN_Y + offset_y, TRY_AGAIN_X + 4, 2, WHITE, CYAN, "TRY AGAIN\0"); //sa offset_x bude previse desno ne kuzim zasto ??
 	}
 	
 }
@@ -347,8 +347,8 @@ int main() {
 
 	TFT_start();
 	
-	uint16_t TP_X;                  // received coordiates rom tuch part of screen
-	uint16_t TP_Y;                  // received coordiates rom tuch part of screen
+	uint16_t TP_X;                  // received coordiates from touch part of screen
+	uint16_t TP_Y;                  // received coordiates from touch part of screen
 	set_background_color(CYAN);
 	uint8_t currentPage = HOMESCREEN; //0 - homescreen //vratit na HOMESCREEN
 	char str[22] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'V', 'Z'};

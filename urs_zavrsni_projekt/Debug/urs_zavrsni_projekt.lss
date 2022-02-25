@@ -1306,7 +1306,7 @@ Disassembly of section .text:
 
 00000a6e <_Z19adafruit_drawCirclejjjj>:
 
-void adafruit_drawCircle(uint16_t x0, uint16_t y0, uint16_t r, uint16_t color) { //unutar adaFruit library, bolji zato jer mu das srediste, i radius, a ovaj draw_cirle ne kuzim kako radi
+void adafruit_drawCircle(uint16_t x0, uint16_t y0, uint16_t r, uint16_t color) { //unutar adaFruit library, bolji zato jer mu das srediste, i radius
      a6e:	2f 92       	push	r2
      a70:	3f 92       	push	r3
      a72:	4f 92       	push	r4
@@ -2847,7 +2847,7 @@ void drawNames(Player *players) {
     1458:	9f 93       	push	r25
     145a:	8f 93       	push	r24
     145c:	0e 94 60 10 	call	0x20c0	; 0x20c0 <sprintf>
-	uint8_t offset_x = (MAX_Y - BLANK_SPACE - (BCK_BTN_X + BCK_BTN_W) - strlen(tmp) * CHAR_W * 2) / 2; //2 je FONT_SIZE, 220 -> sirina od kraja BCK_BTN do 310
+	uint8_t offset_x = (MAX_Y - BLANK_SPACE - (BCK_BTN_X + BCK_BTN_W) - strlen(tmp) * CHAR_W * 2) / 2; //2 je FONT_SIZE
     1460:	f7 01       	movw	r30, r14
     1462:	01 90       	ld	r0, Z+
     1464:	00 20       	and	r0, r0
@@ -2855,7 +2855,7 @@ void drawNames(Player *players) {
     1468:	31 97       	sbiw	r30, 0x01	; 1
     146a:	ee 19       	sub	r30, r14
     146c:	ff 09       	sbc	r31, r15
-	print_string(BLANK_SPACE, (BCK_BTN_X + BCK_BTN_W) + offset_x, 2, WHITE, CYAN, tmp); //90 je kraj od bck btn,, mozda da je ime svako u svojoj boji ili kako oces
+	print_string(BLANK_SPACE, (BCK_BTN_X + BCK_BTN_W) + offset_x, 2, WHITE, CYAN, tmp);
     146e:	cf 01       	movw	r24, r30
     1470:	88 0f       	add	r24, r24
     1472:	99 1f       	adc	r25, r25
@@ -2952,8 +2952,6 @@ void drawGrid() {
     151c:	08 95       	ret
 
 0000151e <_Z8drawTurnP6Player>:
-	
-	//my_drawCircle(GRID_STARTING_Y + GRID_BLOCK_SIZE + GRID_BLOCK_SIZE/2, GRID_STARTING_X + GRID_BLOCK_SIZE + GRID_BLOCK_SIZE/2, 30, WHITE);	
 }
 
 void drawTurn(Player *players) {
@@ -2986,7 +2984,7 @@ void drawTurn(Player *players) {
     1550:	80 91 60 00 	lds	r24, 0x0060	; 0x800060 <__data_start>
     1554:	81 30       	cpi	r24, 0x01	; 1
     1556:	59 f5       	brne	.+86     	; 0x15ae <_Z8drawTurnP6Player+0x90>
-		print_string(BCK_BTN_Y + BCK_BTN_H + 7*BLANK_SPACE, BCK_BTN_X, 2, CYAN, CYAN, players[nought_chosen].name); //prvo prebrise starog tj poboja mu i slova i pozadinu u boju pozadine (CYAN) zato jer ako jedan ima duze ime od drugog onda ce od tog koji ima duze ime slova od njegovog imena ce se i dalje vidit pored imena od ovog koji ima krace
+		print_string(BCK_BTN_Y + BCK_BTN_H + 7*BLANK_SPACE, BCK_BTN_X, 2, CYAN, CYAN, players[nought_chosen].name); 
     1558:	80 91 64 00 	lds	r24, 0x0064	; 0x800064 <nought_chosen>
     155c:	0f 2e       	mov	r0, r31
     155e:	fb e0       	ldi	r31, 0x0B	; 11
@@ -3028,7 +3026,7 @@ void drawTurn(Player *players) {
     15a8:	0e 94 b4 03 	call	0x768	; 0x768 <_Z12print_stringjjhjjPKc>
     15ac:	2c c0       	rjmp	.+88     	; 0x1606 <_Z8drawTurnP6Player+0xe8>
 	}else{
-		print_string(BCK_BTN_Y + BCK_BTN_H + 7*BLANK_SPACE, BCK_BTN_X, 2, CYAN, CYAN, players[cross_chosen].name); //prvo prebrise starog tj poboja mu i slova i pozadinu u boju pozadine (CYAN) zato jer ako jedan ima duze ime od drugog onda ce od tog koji ima duze ime slova od njegovog imena ce se i dalje vidit pored imena od ovog koji ima krace
+		print_string(BCK_BTN_Y + BCK_BTN_H + 7*BLANK_SPACE, BCK_BTN_X, 2, CYAN, CYAN, players[cross_chosen].name);
     15ae:	80 91 65 00 	lds	r24, 0x0065	; 0x800065 <cross_chosen>
     15b2:	0f 2e       	mov	r0, r31
     15b4:	fb e0       	ldi	r31, 0x0B	; 11
@@ -3083,8 +3081,8 @@ void drawTurn(Player *players) {
 
 00001616 <_Z10drawOnGridhh>:
 
-uint8_t drawOnGrid(uint8_t y, uint8_t x) { //skuzi kako ovo centrirat i napravi preko define-ova
-	if(currentPlayer == CROSS) { //nesto sa players[cross_chosen]
+uint8_t drawOnGrid(uint8_t y, uint8_t x) {
+	if(currentPlayer == CROSS) {
     1616:	90 91 60 00 	lds	r25, 0x0060	; 0x800060 <__data_start>
     161a:	91 30       	cpi	r25, 0x01	; 1
     161c:	69 f4       	brne	.+26     	; 0x1638 <_Z10drawOnGridhh+0x22>
@@ -3507,18 +3505,15 @@ int main() {
 	TFT_init();
     18ba:	0e 94 be 00 	call	0x17c	; 0x17c <_Z8TFT_initv>
 
-	//initialize_menu();
-
 	TFT_start();
     18be:	0e 94 49 00 	call	0x92	; 0x92 <_Z9TFT_startv>
 	
 	uint16_t TP_X;                  // received coordiates rom tuch part of screen
 	uint16_t TP_Y;                  // received coordiates rom tuch part of screen
-	set_background_color(CYAN); //kao neki clearscr
+	set_background_color(CYAN);
     18c2:	8e ea       	ldi	r24, 0xAE	; 174
     18c4:	9a e1       	ldi	r25, 0x1A	; 26
     18c6:	0e 94 d4 02 	call	0x5a8	; 0x5a8 <_Z20set_background_colorj>
-	//uint8_t i = 0;
 	uint8_t currentPage = HOMESCREEN; //0 - homescreen //vratit na HOMESCREEN
     18ca:	1d 82       	std	Y+5, r1	; 0x05
 	char str[22] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'V', 'Z'};
@@ -3531,21 +3526,19 @@ int main() {
     18d8:	0d 92       	st	X+, r0
     18da:	8a 95       	dec	r24
     18dc:	e1 f7       	brne	.-8      	; 0x18d6 <main+0x32>
-	//print_keyboard(str);
-	//Player players[4];
 	uint8_t game_rerender = 1;
     18de:	81 e0       	ldi	r24, 0x01	; 1
     18e0:	8c 8f       	std	Y+28, r24	; 0x1c
 						if(check_touch(TP_X, TP_Y, GRID_STARTING_Y + j*GRID_BLOCK_SIZE, GRID_STARTING_X + i*GRID_BLOCK_SIZE, GRID_BLOCK_SIZE, GRID_BLOCK_SIZE)) {
-							if(board[i][j] == EMPTY) { //ovo sa konstantama
-								board[i][j] = currentPlayer; //ovo mozes da je 1 ili 2 s obzirom dal je X iil O
+							if(board[i][j] == EMPTY) { 
+								board[i][j] = currentPlayer;
 								numberOfMoves++;
 								currentPlayer = drawOnGrid(GRID_STARTING_Y + j*GRID_BLOCK_SIZE, GRID_STARTING_X + i*GRID_BLOCK_SIZE); //y i x koordinate gornjeg lijevog kuta kvadrata na koji je stisnuo
 								game_rerender = 1;
     18e2:	33 24       	eor	r3, r3
     18e4:	33 94       	inc	r3
-	//players[2] = p3;
-	//players[3] = p4;
+	uint8_t game_rerender = 1;
+	Player players[MAX_PLAYERS];
 	
 	while (1) {
 		// if screen is touched
@@ -3553,8 +3546,7 @@ int main() {
     18e6:	8d 81       	ldd	r24, Y+5	; 0x05
     18e8:	81 11       	cpse	r24, r1
     18ea:	67 c0       	rjmp	.+206    	; 0x19ba <main+0x116>
-			//clrScr();
-			if(hs_first_enter) { //bez ovoga ostanu stvari od proslog page-a nez zas iako sam gore u back buttonu stavio clrScr() ??
+			if(hs_first_enter) {
     18ec:	80 91 63 00 	lds	r24, 0x0063	; 0x800063 <hs_first_enter>
     18f0:	88 23       	and	r24, r24
     18f2:	31 f0       	breq	.+12     	; 0x1900 <main+0x5c>
@@ -3569,7 +3561,6 @@ int main() {
     1900:	30 92 62 00 	sts	0x0062, r3	; 0x800062 <cp_rerender>
 			game_rerender = 1;
     1904:	3c 8e       	std	Y+28, r3	; 0x1c
-			//drawHomeScreen();
 			if(get_bit(PINB, T_IRQ) == 0) {
     1906:	b0 99       	sbic	0x16, 0	; 22
     1908:	ee cf       	rjmp	.-36     	; 0x18e6 <main+0x42>
@@ -3658,7 +3649,7 @@ int main() {
     19a6:	88 23       	and	r24, r24
     19a8:	09 f4       	brne	.+2      	; 0x19ac <main+0x108>
     19aa:	9d cf       	rjmp	.-198    	; 0x18e6 <main+0x42>
-					clrScr(); //tu da se clear-a da se stalno ne re-cleara
+					clrScr(); 
     19ac:	0e 94 6d 07 	call	0xeda	; 0xeda <_Z6clrScrv>
 					hs_first_enter = 1;
     19b0:	30 92 63 00 	sts	0x0063, r3	; 0x800063 <hs_first_enter>
@@ -3672,8 +3663,6 @@ int main() {
     19ba:	81 30       	cpi	r24, 0x01	; 1
     19bc:	09 f0       	breq	.+2      	; 0x19c0 <main+0x11c>
     19be:	46 c1       	rjmp	.+652    	; 0x1c4c <main+0x3a8>
-			//drawBackButton();
-			//print_keyboard(str); //stavi da se ponovo rendera tek kad dode do promjene
 			checkBackButtonPressed(&TP_X, &TP_Y, &currentPage, players, &game_rerender);
     19c0:	8e 01       	movw	r16, r28
     19c2:	04 5e       	subi	r16, 0xE4	; 228
@@ -3690,15 +3679,13 @@ int main() {
     19d8:	ce 01       	movw	r24, r28
     19da:	01 96       	adiw	r24, 0x01	; 1
     19dc:	0e 94 b0 07 	call	0xf60	; 0xf60 <_Z22checkBackButtonPressedPjS_PhP6PlayerS0_>
-			//drawDeleteButton();
-			//drawOKButton();
 			if(np_rerender) {
     19e0:	80 91 61 00 	lds	r24, 0x0061	; 0x800061 <np_rerender>
     19e4:	88 23       	and	r24, r24
     19e6:	61 f0       	breq	.+24     	; 0x1a00 <main+0x15c>
 				drawBackButton();
     19e8:	0e 94 47 07 	call	0xe8e	; 0xe8e <_Z14drawBackButtonv>
-				print_keyboard(str); //stavi da se ponovo rendera tek kad dode do promjene
+				print_keyboard(str);
     19ec:	ce 01       	movw	r24, r28
     19ee:	06 96       	adiw	r24, 0x06	; 6
     19f0:	0e 94 6a 06 	call	0xcd4	; 0xcd4 <_Z14print_keyboardPc>
@@ -3775,7 +3762,7 @@ int main() {
     1a68:	0e 94 48 06 	call	0xc90	; 0xc90 <_Z11check_touchjjjjjj>
     1a6c:	88 23       	and	r24, r24
     1a6e:	71 f1       	breq	.+92     	; 0x1acc <main+0x228>
-						if(newPlayerNameIndex == (MAX_NAME_LENGTH-1)) break; //jer ime ima max 7 char-a, ako je == 6 (zadnji index) naci da je vec sve upisao jer na zadnji mora doc nulterm
+						if(newPlayerNameIndex == (MAX_NAME_LENGTH-1)) break;
     1a70:	80 90 c8 01 	lds	r8, 0x01C8	; 0x8001c8 <newPlayerNameIndex>
     1a74:	26 e0       	ldi	r18, 0x06	; 6
     1a76:	82 16       	cp	r8, r18
@@ -3819,10 +3806,8 @@ int main() {
     1abe:	88 ec       	ldi	r24, 0xC8	; 200
     1ac0:	90 e0       	ldi	r25, 0x00	; 0
     1ac2:	0e 94 b4 03 	call	0x768	; 0x768 <_Z12print_stringjjhjjPKc>
-						//_delay_ms(500); //da ne napravi previse ocitanja
 						np_rerender = 1;
     1ac6:	30 92 61 00 	sts	0x0061, r3	; 0x800061 <np_rerender>
-						//_delay_ms(100);
 						break;
     1aca:	04 c0       	rjmp	.+8      	; 0x1ad4 <main+0x230>
 				np_rerender = 0;
@@ -3835,8 +3820,8 @@ int main() {
     1ace:	46 e1       	ldi	r20, 0x16	; 22
     1ad0:	94 12       	cpse	r9, r20
     1ad2:	ac cf       	rjmp	.-168    	; 0x1a2c <main+0x188>
+						print_string(INPUT_NAME_Y, INPUT_NAME_X, 3, WHITE, CYAN, newPlayerName);
 						np_rerender = 1;
-						//_delay_ms(100);
 						break;
 					}
 				}
@@ -3949,7 +3934,6 @@ int main() {
     1b9c:	88 23       	and	r24, r24
     1b9e:	09 f4       	brne	.+2      	; 0x1ba2 <main+0x2fe>
     1ba0:	a2 ce       	rjmp	.-700    	; 0x18e6 <main+0x42>
-					//create player i da se vrati na homescreen
 					if(players_size == MAX_PLAYERS || !newPlayerNameIndex) continue; //ako je 4 igraca ili ako nista nije unio kao ime
     1ba2:	30 91 c7 01 	lds	r19, 0x01C7	; 0x8001c7 <players_size>
     1ba6:	34 30       	cpi	r19, 0x04	; 4
@@ -3961,9 +3945,8 @@ int main() {
     1bb4:	98 ce       	rjmp	.-720    	; 0x18e6 <main+0x42>
     1bb6:	20 e0       	ldi	r18, 0x00	; 0
 					Player newPlayer;
-					//newPlayer.name = newPlayerName;
-					
-					for(uint8_t i = 0; i < strlen(newPlayerName); i++) { //morat ces reset-at newPlayerName i to --jesam
+										
+					for(uint8_t i = 0; i < strlen(newPlayerName); i++) {
     1bb8:	e6 e6       	ldi	r30, 0x66	; 102
     1bba:	f0 e0       	ldi	r31, 0x00	; 0
     1bbc:	01 90       	ld	r0, Z+
@@ -3989,16 +3972,17 @@ int main() {
     1be2:	bf 4f       	sbci	r27, 0xFF	; 255
     1be4:	8c 91       	ld	r24, X
     1be6:	84 83       	std	Z+4, r24	; 0x04
-					//create player i da se vrati na homescreen
+				
+				if(check_touch(TP_X, TP_Y, OK_BTN_Y, OK_BTN_X, OK_BTN_H, OK_BTN_W)) { //OK button
 					if(players_size == MAX_PLAYERS || !newPlayerNameIndex) continue; //ako je 4 igraca ili ako nista nije unio kao ime
 					Player newPlayer;
-					//newPlayer.name = newPlayerName;
-					
-					for(uint8_t i = 0; i < strlen(newPlayerName); i++) { //morat ces reset-at newPlayerName i to --jesam
+										
+					for(uint8_t i = 0; i < strlen(newPlayerName); i++) {
     1be8:	2f 5f       	subi	r18, 0xFF	; 255
     1bea:	e6 cf       	rjmp	.-52     	; 0x1bb8 <main+0x314>
 						newPlayer.name[i] = newPlayerName[i];
 					}
+					
 					newPlayer.name[newPlayerNameIndex] = '\0';
     1bec:	e9 e4       	ldi	r30, 0x49	; 73
     1bee:	f0 e0       	ldi	r31, 0x00	; 0
@@ -4076,7 +4060,7 @@ int main() {
     1c6a:	ce 01       	movw	r24, r28
     1c6c:	01 96       	adiw	r24, 0x01	; 1
     1c6e:	0e 94 b0 07 	call	0xf60	; 0xf60 <_Z22checkBackButtonPressedPjS_PhP6PlayerS0_>
-			if(cp_rerender) { //tako da ne radi stalno rerender ako se nista nije promjenilo, puno je responzivnije na ovaj nacin
+			if(cp_rerender) {
     1c72:	80 91 62 00 	lds	r24, 0x0062	; 0x800062 <cp_rerender>
     1c76:	88 23       	and	r24, r24
     1c78:	61 f0       	breq	.+24     	; 0x1c92 <main+0x3ee>
@@ -4110,7 +4094,7 @@ int main() {
     1caa:	09 f4       	brne	.+2      	; 0x1cae <main+0x40a>
     1cac:	b1 c0       	rjmp	.+354    	; 0x1e10 <main+0x56c>
 					tmp = i > 1 ? 50 : 0;
-					if(check_touch(TP_X, TP_Y, SP_BTN_Y + tmp, SP_BTN_X + (i%2)*(SP_BTN_W + BLANK_SPACE), SP_BTN_H, SP_BTN_W)) { //skuzi zasto poboja cijeli stupac ako gornjeg stisnes, a nista ako donjeg --jer ti je tmp bio izvan petlje
+					if(check_touch(TP_X, TP_Y, SP_BTN_Y + tmp, SP_BTN_X + (i%2)*(SP_BTN_W + BLANK_SPACE), SP_BTN_H, SP_BTN_W)) {
     1cae:	ab 80       	ldd	r10, Y+3	; 0x03
     1cb0:	bc 80       	ldd	r11, Y+4	; 0x04
     1cb2:	c9 80       	ldd	r12, Y+1	; 0x01
@@ -4123,7 +4107,7 @@ int main() {
 				for(uint8_t i = 0; i < players_size; i++) {
 					tmp = i > 1 ? 50 : 0;
     1cb8:	40 e0       	ldi	r20, 0x00	; 0
-					if(check_touch(TP_X, TP_Y, SP_BTN_Y + tmp, SP_BTN_X + (i%2)*(SP_BTN_W + BLANK_SPACE), SP_BTN_H, SP_BTN_W)) { //skuzi zasto poboja cijeli stupac ako gornjeg stisnes, a nista ako donjeg --jer ti je tmp bio izvan petlje
+					if(check_touch(TP_X, TP_Y, SP_BTN_Y + tmp, SP_BTN_X + (i%2)*(SP_BTN_W + BLANK_SPACE), SP_BTN_H, SP_BTN_W)) {
     1cba:	0f 2e       	mov	r0, r31
     1cbc:	f2 e8       	ldi	r31, 0x82	; 130
     1cbe:	7f 2e       	mov	r7, r31
@@ -4142,7 +4126,7 @@ int main() {
     1ccc:	46 2d       	mov	r20, r6
     1cce:	01 c0       	rjmp	.+2      	; 0x1cd2 <main+0x42e>
     1cd0:	42 e3       	ldi	r20, 0x32	; 50
-					if(check_touch(TP_X, TP_Y, SP_BTN_Y + tmp, SP_BTN_X + (i%2)*(SP_BTN_W + BLANK_SPACE), SP_BTN_H, SP_BTN_W)) { //skuzi zasto poboja cijeli stupac ako gornjeg stisnes, a nista ako donjeg --jer ti je tmp bio izvan petlje
+					if(check_touch(TP_X, TP_Y, SP_BTN_Y + tmp, SP_BTN_X + (i%2)*(SP_BTN_W + BLANK_SPACE), SP_BTN_H, SP_BTN_W)) {
     1cd2:	90 fa       	bst	r9, 0
     1cd4:	44 24       	eor	r4, r4
     1cd6:	40 f8       	bld	r4, 0
@@ -4312,7 +4296,7 @@ int main() {
     1e00:	00 c0       	rjmp	.+0      	; 0x1e02 <main+0x55e>
     1e02:	00 00       	nop
 						}
-						_delay_ms(100); //da ne napravi 2 ocitanja
+						_delay_ms(100); 
 						cp_rerender = 1;
     1e04:	30 92 62 00 	sts	0x0062, r3	; 0x800062 <cp_rerender>
 						break;
@@ -4365,7 +4349,7 @@ int main() {
 						currentPage = GAME;
     1e50:	84 e0       	ldi	r24, 0x04	; 4
     1e52:	8d 83       	std	Y+5, r24	; 0x05
-						game_rerender = 1; //dok ovo nisam napravio, prvi put nakon sta si stisnuo back i usao u GAME ovo bi bilo 0 iako se unutar checkBackButton to stavi na 1 ?????
+						game_rerender = 1; 
     1e54:	3c 8e       	std	Y+28, r3	; 0x1c
     1e56:	47 cd       	rjmp	.-1394   	; 0x18e6 <main+0x42>
 					}
@@ -4392,7 +4376,6 @@ int main() {
     1e78:	ce 01       	movw	r24, r28
     1e7a:	01 96       	adiw	r24, 0x01	; 1
     1e7c:	0e 94 b0 07 	call	0xf60	; 0xf60 <_Z22checkBackButtonPressedPjS_PhP6PlayerS0_>
-			//printLeaderboards(players, sizeof(players) / sizeof(players[0])); //moras prije nego saljes u funkciju jer se u funkciju salje samo pointer, ali ovo ce ti poslat za koliko njih je alocirano mjesta, a ne koliko ih je stvarno unutra
 			printLeaderboards(players, players_size);
     1e80:	60 91 c7 01 	lds	r22, 0x01C7	; 0x8001c7 <players_size>
     1e84:	ce 01       	movw	r24, r28
@@ -4403,7 +4386,6 @@ int main() {
     1e8e:	84 30       	cpi	r24, 0x04	; 4
     1e90:	09 f0       	breq	.+2      	; 0x1e94 <main+0x5f0>
     1e92:	29 cd       	rjmp	.-1454   	; 0x18e6 <main+0x42>
-			//drawBackButton();
 			checkBackButtonPressed(&TP_X, &TP_Y, &currentPage, players, &game_rerender);
     1e94:	8e 01       	movw	r16, r28
     1e96:	04 5e       	subi	r16, 0xE4	; 228
@@ -4420,11 +4402,6 @@ int main() {
     1eac:	ce 01       	movw	r24, r28
     1eae:	01 96       	adiw	r24, 0x01	; 1
     1eb0:	0e 94 b0 07 	call	0xf60	; 0xf60 <_Z22checkBackButtonPressedPjS_PhP6PlayerS0_>
-			//drawNames(players);
-			//drawGrid();
-			//char tmp[2];
-			//sprintf(tmp, "%d\0", game_rerender);
-			//print_string(200, 10, 2, WHITE, CYAN, tmp);
 			if(gameOver && check_touch(TP_X, TP_Y, TRY_AGAIN_Y, TRY_AGAIN_X, TRY_AGAIN_H, TRY_AGAIN_W)) { //TRY AGAIN
     1eb4:	80 91 bd 01 	lds	r24, 0x01BD	; 0x8001bd <gameOver>
     1eb8:	88 23       	and	r24, r24
@@ -4462,19 +4439,19 @@ int main() {
     1ef4:	f8 cc       	rjmp	.-1552   	; 0x18e6 <main+0x42>
     1ef6:	03 c0       	rjmp	.+6      	; 0x1efe <main+0x65a>
 			
-			if(game_rerender) { //da se rerendera tek kad se desi promjena, ne znam zasto se ne rendera kad prvi put udes unutra nakon sta si BACK button stisnuo, ako ne uspijes rjesit onda pusti bez ovog if-a pa ce bit malo manje responzivno --uspio
+			if(game_rerender) { 
     1ef8:	8c 8d       	ldd	r24, Y+28	; 0x1c
     1efa:	88 23       	and	r24, r24
     1efc:	89 f0       	breq	.+34     	; 0x1f20 <main+0x67c>
 				drawBackButton();
     1efe:	0e 94 47 07 	call	0xe8e	; 0xe8e <_Z14drawBackButtonv>
-				drawNames(players); //zbog nekog razloga kad ude tu ponovo vrijednost od game_rerender je 0 ??? --uspio ali svejedno ne kuzim zasto se to desava ??
+				drawNames(players);
     1f02:	ce 01       	movw	r24, r28
     1f04:	4d 96       	adiw	r24, 0x1d	; 29
     1f06:	0e 94 01 0a 	call	0x1402	; 0x1402 <_Z9drawNamesP6Player>
 				drawGrid();
     1f0a:	0e 94 66 0a 	call	0x14cc	; 0x14cc <_Z8drawGridv>
-				checkGameOver(players); //ide ispod ovog if-a tako da se ne vrti bezveze ako je gotovo
+				checkGameOver(players);
     1f0e:	ce 01       	movw	r24, r28
     1f10:	4d 96       	adiw	r24, 0x1d	; 29
     1f12:	0e 94 29 0b 	call	0x1652	; 0x1652 <_Z13checkGameOverP6Player>
@@ -4485,9 +4462,7 @@ int main() {
 				game_rerender = 0;
     1f1e:	1c 8e       	std	Y+28, r1	; 0x1c
 			}
-			
-			//checkGameOver(players); //ide ispod ovog if-a tako da se ne vrti bezveze ako je gotovo
-			//drawTurn(players);		
+					
 			if (get_bit(PINB, T_IRQ) == 0) {
     1f20:	b0 99       	sbic	0x16, 0	; 22
     1f22:	e1 cc       	rjmp	.-1598   	; 0x18e6 <main+0x42>
@@ -4571,7 +4546,7 @@ int main() {
     1fb8:	0e 94 48 06 	call	0xc90	; 0xc90 <_Z11check_touchjjjjjj>
     1fbc:	88 23       	and	r24, r24
     1fbe:	81 f1       	breq	.+96     	; 0x2020 <main+0x77c>
-							if(board[i][j] == EMPTY) { //ovo sa konstantama
+							if(board[i][j] == EMPTY) { 
     1fc0:	f4 01       	movw	r30, r8
     1fc2:	80 81       	ld	r24, Z
     1fc4:	81 11       	cpse	r24, r1
@@ -4581,7 +4556,7 @@ int main() {
     1fcc:	6e ac       	ldd	r6, Y+62	; 0x3e
     1fce:	7f ac       	ldd	r7, Y+63	; 0x3f
     1fd0:	6c 97       	sbiw	r28, 0x1c	; 28
-								board[i][j] = currentPlayer; //ovo mozes da je 1 ili 2 s obzirom dal je X iil O
+								board[i][j] = currentPlayer;
     1fd2:	6e 96       	adiw	r28, 0x1e	; 30
     1fd4:	ee ad       	ldd	r30, Y+62	; 0x3e
     1fd6:	ff ad       	ldd	r31, Y+63	; 0x3f
@@ -4629,8 +4604,8 @@ int main() {
     202c:	4f ef       	ldi	r20, 0xFF	; 255
     202e:	84 1a       	sub	r8, r20
     2030:	94 0a       	sbc	r9, r20
-			//checkGameOver(players); //ide ispod ovog if-a tako da se ne vrti bezveze ako je gotovo
-			//drawTurn(players);		
+			}
+					
 			if (get_bit(PINB, T_IRQ) == 0) {
 				read_touch_coords(&TP_X, &TP_Y);
 				for(uint8_t i = 0; i < 3; i++) {
@@ -4659,9 +4634,9 @@ int main() {
     205c:	fe e3       	ldi	r31, 0x3E	; 62
     205e:	2f 0e       	add	r2, r31
     2060:	31 1c       	adc	r3, r1
-			
-			//checkGameOver(players); //ide ispod ovog if-a tako da se ne vrti bezveze ako je gotovo
-			//drawTurn(players);		
+				game_rerender = 0;
+			}
+					
 			if (get_bit(PINB, T_IRQ) == 0) {
 				read_touch_coords(&TP_X, &TP_Y);
 				for(uint8_t i = 0; i < 3; i++) {
@@ -4678,8 +4653,8 @@ int main() {
     2076:	3f ac       	ldd	r3, Y+63	; 0x3f
     2078:	6f 97       	sbiw	r28, 0x1f	; 31
     207a:	35 cc       	rjmp	.-1942   	; 0x18e6 <main+0x42>
+						print_string(INPUT_NAME_Y, INPUT_NAME_X, 3, WHITE, CYAN, newPlayerName);
 						np_rerender = 1;
-						//_delay_ms(100);
 						break;
 					}
 				}
