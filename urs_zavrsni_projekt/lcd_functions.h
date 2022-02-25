@@ -38,7 +38,7 @@
 #define DATA 1 // data
 
 
-static const unsigned char font[38][5] = { //bilo [29] bez ovih zadnjih 8 brojeva jer su 1 i 2 vec bili
+static const unsigned char font[38][5] = {
 	{0x7E, 0x11, 0x11, 0x11, 0x7E}, // 41 A
 	{0x7F, 0x49, 0x49, 0x49, 0x36}, // 42 B
 	{0x3E, 0x41, 0x41, 0x41, 0x22}, // 43 C
@@ -344,7 +344,7 @@ void draw_cross(uint16_t x, uint16_t y, uint16_t d, uint16_t color) {
 void my_draw_cross(uint16_t x, uint16_t y, uint16_t d, uint16_t color) { //x,y sredista, d je od sredista do kuta
 	uint16_t xl = x - d, yl = y - d, xr = x + d, yr = y - d; //left corner, right corner
 	for(uint8_t i = 0; i < 2*d; i++) {
-		draw_pixel(xl + i, yl + i, color); //nacrtas pa skuzis
+		draw_pixel(xl + i, yl + i, color);
 		draw_pixel(xr - i, yr + i, color);
 	}
 }
@@ -373,7 +373,7 @@ void draw_circle(uint16_t x0, uint16_t y0, uint16_t r, uint16_t color) { //x0,y0
 	} while (x <= 0);
 }
 
-void adafruit_drawCircle(uint16_t x0, uint16_t y0, uint16_t r, uint16_t color) { //unutar adaFruit library, bolji zato jer mu das srediste, i radius, a ovaj draw_cirle ne kuzim kako radi
+void adafruit_drawCircle(uint16_t x0, uint16_t y0, uint16_t r, uint16_t color) { //unutar adaFruit library, bolji zato jer mu das srediste, i radius
 	int16_t f = 1 - r;
 	int16_t ddF_x = 1;
 	int16_t ddF_y = -2 * r;
