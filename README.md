@@ -3,6 +3,7 @@
 
  
  Task of this project was to create tic tac toe game using: ATMega32 microcontroller and TFT 320QVT LCD
+ <br>
  Teamwork: Borna Paro, Jan Šubarić, Anthea Zubčić-Đurđević
 
 
